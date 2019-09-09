@@ -4,12 +4,14 @@ var gamePlane = null;
 var snake = null;
 var fruit = null;
 var gameCycle = null;
+var isGameOver = null;
 
 $(document).ready(function() {
     // Variables
     let canvasId = 'canvas';
     let gridSize = 20;
     let tileSize = 20;
+    isGameOver = false;
 
     // Prepare environment
     gamePlane = new GamePlane(canvasId, gridSize, tileSize);
@@ -87,10 +89,12 @@ function run() {
     // Move snake
     snake.move(nextPosition);
 
-    // Draw all game items
-    gamePlane.draw();
-    fruit.draw();
-    snake.draw();
+    if (!isGameOver) {
+        // Draw all game items
+        gamePlane.draw();
+        fruit.draw();
+        snake.draw();
+    }
     
     //let endTime = performance.now();
     //console.log(`GameCycle took ${endTime - startTime}ms`);
@@ -99,5 +103,6 @@ function run() {
 function gameOver() {
     // Game over
     clearInterval(gameCycle);
+    isGameOver = true;
     console.log('game over');
 }
