@@ -7,13 +7,14 @@ var gameCycle = null;
 
 $(document).ready(function() {
     // Variables
-    let gridSize = 40;
-    let tileSize = 10;
+    let canvasId = 'canvas';
+    let gridSize = 20;
+    let tileSize = 20;
 
     // Prepare environment
-    gamePlane = new GamePlane('canvas', gridSize, tileSize);
-    snake = new Snake(300, tileSize, 20, 10, 10, 'canvas');
-    fruit = new Fruit(gridSize, gridSize, tileSize, tileSize, 'canvas', snake.trail);
+    gamePlane = new GamePlane(canvasId, gridSize, tileSize);
+    snake = new Snake(3, tileSize, 20, 10, 10, canvasId);
+    fruit = new Fruit(gridSize, gridSize, tileSize, tileSize, canvasId, snake.trail);
 
     // Start the game
     gameCycle = setInterval(run, snake.speed);
@@ -21,29 +22,60 @@ $(document).ready(function() {
 
 function run() {
     //let startTime = performance.now();
-    let continueGame = true;
     let nextPosition = snake.getNextHeadPosition();
+    // Put all occupied positions into one array
+    let occupiedPositions = [];
+    Array.prototype.push.apply(occupiedPositions, snake.trail);
+    Array.prototype.push.apply(occupiedPositions, snake.shitTrail);
+
+    let fruitWillBeEaten = fruit.isEaten(nextPosition);
+    let newFruitPosition = null;
+    let newFruitPositionIsFree = true;
 
     // Check the walls
     if (gamePlane.positionIsOutside(nextPosition)) { 
         // Game plane with walls
-        continueGame = false;
+        gameOver();
 
         // Infinite Game plane
         //nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
     }
 
-    // Check snake tail collision
-    if (!snake.move(nextPosition)) { continueGame = false; }
+    // Iterate through all occupied positions and make all checks for each of them
+    do {
+        if (fruitWillBeEaten) {
+            console.log('Trying to find new fruit position...');
+            if (snake.length > gamePlane.gridSize * gamePlane.gridSize - gamePlane.gridSize * gamePlane.gridSize / 10) {
+                // smarter way to generate new fruit position
+                console.log('Not implemented smart new fruit position generation...');
+                newFruitPosition = {x: -1, y: -1};
+                fruit.position = newFruitPosition;
+            } else {
+                newFruitPosition = fruit.getNewPosition();
+            }
+            newFruitPositionIsFree = true;
+        }
 
-    // Check the apple
-    if (fruit.isEaten(nextPosition)) {
+        for (const item of occupiedPositions) {
+            // Check snake tail collision
+            if (item.x == nextPosition.x && item.y == nextPosition.y) { gameOver(); break; }
+
+            // Check new fruit position
+            if (fruitWillBeEaten && item.x == newFruitPosition.x && item.y == newFruitPosition.y) { 
+                newFruitPositionIsFree = false; 
+                console.log('New fruit position is occupied...');
+                break;
+            }
+        }
+    } while (!newFruitPositionIsFree);
+
+    if (fruitWillBeEaten) {
         snake.increaseLength();
-        fruit.generateNewPosition(snake.trail);
+
         // Check the snake speed change
         if (snake.length % 10 == 0) {
             // Change setInterval time
-            snake.speed -= 30;
+            snake.speed -= 10;
             if (snake.speed < 30) { snake.speed = 30; }
             
             // Reset gameCycle interval
@@ -52,19 +84,20 @@ function run() {
         }
     }
 
-    if (continueGame) {
+    // Move snake
+    snake.move(nextPosition);
 
-        // Draw all game items
-        gamePlane.draw();
-        fruit.draw();
-        snake.draw();
-    }
-    else {
-        // Game over
-        clearInterval(gameCycle);
-        console.log('game over');
-    }
+    // Draw all game items
+    gamePlane.draw();
+    fruit.draw();
+    snake.draw();
     
     //let endTime = performance.now();
     //console.log(`GameCycle took ${endTime - startTime}ms`);
+}
+
+function gameOver() {
+    // Game over
+    clearInterval(gameCycle);
+    console.log('game over');
 }

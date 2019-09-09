@@ -14,27 +14,13 @@ class Fruit {
         this.height = height;
         this.canvas = document.getElementById(canvasId).getContext('2d');
 
-        this.generateNewPosition(initialExcludePositions);
+        this.getNewPosition(initialExcludePositions);
         this.draw();
     }
 
-    generateNewPosition(excludePositions) {
-        let positionIsFree = true;
-
-        do {
-            console.log('Trying to find new fruit position...');
-            this.position.x = Math.floor(Math.random() * this.maxX);
-            this.position.y = Math.floor(Math.random() * this.maxY);
-            positionIsFree = true;
-
-            for (const item of excludePositions) {
-                if (item.x == this.position.x && item.y == this.position.y) { 
-                    positionIsFree = false; 
-                    console.log('New fruit position is occupied...');
-                    break;
-                }
-            }
-        } while (!positionIsFree);
+    getNewPosition() {        
+        this.position.x = Math.floor(Math.random() * this.maxX);
+        this.position.y = Math.floor(Math.random() * this.maxY);
 
         return this.position;
     }

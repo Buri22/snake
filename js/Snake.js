@@ -2,11 +2,13 @@ const DIRECTION = {up: 1, right: 2, down: 3, left: 4};
 
 class Snake {
     color = 'lime';
+    shitColor = 'brown';
     length = null;
     width = null
     peaceSize = null;
     headPosition = {x: null, y: null};
     trail = [];
+    shitTrail = [];
     speed = 150;                    // in milliseconds
     direction = DIRECTION.right;    // default direction
     canvas = null;
@@ -32,13 +34,9 @@ class Snake {
     }
 
     move(newHeadPosition) {
+        let newShit = null;
         while (this.trail.length >= this.length) {
-            this.trail.shift();
-        }
-
-        // Check if the next position is in trail
-        for (const item of this.trail) {
-            if (item.x == newHeadPosition.x && item.y == newHeadPosition.y) { return false; }
+            newShit = this.trail.shift();
         }
 
         this.trail.push(newHeadPosition);
@@ -46,12 +44,24 @@ class Snake {
         // Set new head position
         this.headPosition = newHeadPosition;
 
+        if (newShit != null && this.doesMakeShit()) {
+            this.shitTrail.push(newShit);
+        }
+
         return true;
     }
 
     draw() {
+        // Draw the snake
         this.canvas.fillStyle = this.color;
         this.trail.forEach(item => {
+            this.canvas.fillRect(item.x * this.width, item.y * this.width, 
+                this.width - 2, this.width - 2);
+        });
+
+        // Draw snake shit
+        this.canvas.fillStyle = this.shitColor;
+        this.shitTrail.forEach(item => {
             this.canvas.fillRect(item.x * this.width, item.y * this.width, 
                 this.width - 2, this.width - 2);
         });
@@ -128,5 +138,10 @@ class Snake {
                 this.directionsStack[this.moveIndex + 2] = newDirection;
             }
         }
+    }
+
+    doesMakeShit() {
+        return this.shitTrail.length < Math.floor(this.trail.length / 5) 
+            && Math.floor(Math.random() * 100) < 25;
     }
 }
