@@ -7,22 +7,25 @@ class Fruit {
     width = null;
     canvas = null;
 
-    constructor (maxX, maxY, width, height, canvasId, initialExcludePositions) {
+    constructor (maxX, maxY, width, height, canvasId, initialPosition) {
         this.maxX = maxX;
         this.maxY = maxY;
         this.width = width;
         this.height = height;
         this.canvas = document.getElementById(canvasId).getContext('2d');
-
-        this.getNewPosition(initialExcludePositions);
+        this.position = initialPosition;
+        //this.getNewPosition();
         this.draw();
     }
 
-    getNewPosition() {        
-        this.position.x = Math.floor(Math.random() * this.maxX);
-        this.position.y = Math.floor(Math.random() * this.maxY);
+    // getNewPosition() {        
+    //     this.position.x = Math.floor(Math.random() * this.maxX);
+    //     this.position.y = Math.floor(Math.random() * this.maxY);
 
-        return this.position;
+    //     return this.position;
+    // }
+    setNewPosition(position) {
+        this.position = position;
     }
 
     draw() {

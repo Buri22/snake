@@ -2,41 +2,40 @@ const DIRECTION = {up: 1, right: 2, down: 3, left: 4};
 
 class Snake {
     color = 'lime';
-    shitColor = 'brown';
+    shitColor = '#663300';
     length = null;
-    width = null
-    peaceSize = null;
+    width = null;
     headPosition = {x: null, y: null};
     trail = [];
     shitTrail = [];
     speed = 150;                    // in milliseconds
-    direction = DIRECTION.right;    // default direction
+    direction = DIRECTION.down;     // default direction
     canvas = null;
     moveIndex = 0;
     directionsStack = [];
 
-    constructor (initialLength, initialWidth, peaceSize, initialX, initialY, canvasId) {
+    constructor (initialTrail, initialWidth, canvasId) {
         this.canvas = document.getElementById(canvasId).getContext('2d');
-        this.length = initialLength;
+        this.length = initialTrail.length;
+        this.trail = initialTrail;
+        this.headPosition = this.trail[this.length - 1];
         this.width = initialWidth;
-        this.peaceSize = peaceSize;
-        this.headPosition.x = initialX;
-        this.headPosition.y = initialY;
-
-        // Initialize trail for the given length and initial position
-        for (let index = 0; index < this.length; index++) {
-            this.trail.unshift({x: this.headPosition.x - index, y: this.headPosition.y});
-        }
 
         window.addEventListener('keydown', this.changeDirection.bind(this));
 
         this.draw();
     }
 
+    // Input => new head position
+    // Returns => new free position or shit position
     move(newHeadPosition) {
-        let newShit = null;
+        let result = {
+            position: null,
+            isFree: true
+        };
+
         while (this.trail.length >= this.length) {
-            newShit = this.trail.shift();
+            result.position = this.trail.shift();
         }
 
         this.trail.push(newHeadPosition);
@@ -44,19 +43,22 @@ class Snake {
         // Set new head position
         this.headPosition = newHeadPosition;
 
-        if (newShit != null && this.doesMakeShit()) {
-            this.shitTrail.push(newShit);
+        if (result.position != null && this.doesMakeShit()) {
+            this.shitTrail.push(result.position);
+            result.isFree = false;
         }
 
-        return true;
+        return result;
     }
 
     draw() {
         // Draw the snake
         this.canvas.fillStyle = this.color;
         this.trail.forEach(item => {
+            // this.canvas.fillRect(item.x * this.width, item.y * this.width, 
+            //     this.width - 2, this.width - 2);
             this.canvas.fillRect(item.x * this.width, item.y * this.width, 
-                this.width - 2, this.width - 2);
+                this.width, this.width);
         });
 
         // Draw snake shit

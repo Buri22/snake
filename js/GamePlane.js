@@ -7,6 +7,7 @@ class GamePlane {
     gridSize = null;
     tileSize = null;
     bgColor = 'black';
+    freePositions = [];
 
     constructor (canvasId, gridSize, tileSize) {
         this.canvasId = canvasId;
@@ -21,6 +22,19 @@ class GamePlane {
 
         // Get canvas context
         this.canvas = document.getElementById(this.canvasId).getContext('2d');
+
+        // Set freePositions array
+        for (let index = 0; index < gridSize * gridSize; index++) {
+            if (index == 0) {
+                this.freePositions.push({x: 0, y: 0});
+            }
+            else {
+                this.freePositions.push({
+                    x: Math.floor(index / gridSize), 
+                    y: index % gridSize
+                });
+            }
+        }
 
         // Draw the default layout
         this.draw();
@@ -38,6 +52,27 @@ class GamePlane {
             return false;
         }
         return true;
+    }
+    
+    getFreePosition() {
+        return this.freePositions[Math.floor(Math.random() * this.freePositions.length)];
+    }
+
+    removeFreePosition(position) {
+        for (let i = this.freePositions.length - 1; i >= 0; --i) {
+            if (this.freePositions[i].x == position.x && this.freePositions[i].y == position.y) {
+                this.freePositions.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    isPositionFree() {
+        let result = false;
+
+
+
+        return result;
     }
 
     getInfiniteNextPosition(position) {
