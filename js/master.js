@@ -7,6 +7,7 @@ var bug = null;
 var gameCycle = null;
 var isGameOver = null;
 var gameCycleDurations = [];
+var gamePause = false;
 
 $(document).ready(function() {
     // Variables
@@ -16,7 +17,7 @@ $(document).ready(function() {
 
     // Prepare environment
     gamePlane = new GamePlane(canvasId, gridSize, tileSize);
-    snakeTrail = gamePlane.freePositions.splice(gamePlane.freePositions.length / 2 - 300, 300);
+    snakeTrail = gamePlane.freePositions.splice(gamePlane.freePositions.length / 2 - 3, 3);
     snake = new Snake(snakeTrail, tileSize, canvasId);
     fruit = new Fruit(gridSize, gridSize, tileSize, tileSize, canvasId, gamePlane.getFreePosition());
     bug = new Bug(canvasId, gamePlane.getFreePosition(), tileSize);
@@ -24,6 +25,9 @@ $(document).ready(function() {
     // Start the game
     isGameOver = false;
     gameCycle = setInterval(run, snake.speed);
+
+    // Listen to events
+    window.addEventListener('keydown', toggleGamePause);
 });
 
 function run() {
@@ -99,6 +103,19 @@ function run() {
     let endTime = performance.now();
     gameCycleDurations.push(endTime - startTime);
     //console.log(`GameCycle took ${endTime - startTime}ms`);
+}
+
+function toggleGamePause(event) {
+    if (event.keyCode == 80) {
+        if (gamePause) {
+            gamePause = false;
+            gameCycle = setInterval(run, snake.speed);
+        }
+        else {
+            gamePause = true;
+            clearInterval(gameCycle);
+        }
+    }
 }
 
 function gameOver() {
