@@ -15,17 +15,18 @@ var gamePause = false;
 
 $(document).ready(function() {
     // Variables
-    let canvasId = 'canvas';
+    //let canvasId = 'canvas';
+    let canvas = document.getElementById('canvas').getContext('2d');
     let gridSize = 25;
     let tileSize = 15;
     let snakeInitialLength = 3;
 
     // Prepare environment
-    gamePlane = new GamePlane(canvasId, gridSize, tileSize);
+    gamePlane = new GamePlane(canvas, gridSize, tileSize);
     let snakeTrail = gamePlane.freePositions.splice(gamePlane.freePositions.length / 2 - snakeInitialLength, snakeInitialLength);
-    snake = new Snake(snakeTrail, tileSize, canvasId);
-    fruit = new Fruit(gridSize, gridSize, tileSize, tileSize, canvasId, gamePlane.getFreePosition().position);
-    bug = new Bug(canvasId, gamePlane.getFreePosition().position, tileSize);
+    snake = new Snake(snakeTrail, tileSize, canvas);
+    fruit = new Fruit(gridSize, gridSize, tileSize, tileSize, canvas, gamePlane.getFreePosition().position);
+    bug = new Bug(canvas, gamePlane.getFreePosition().position, tileSize);
 
     // Start the game
     isGameOver = false;
@@ -51,7 +52,7 @@ function run() {
 
     // Iterate through all occupied positions and make all checks for each of them
     let occupiedPositions = [];
-    Array.prototype.push.apply(occupiedPositions, snake.trail);
+    Array.prototype.push.apply(occupiedPositions, snake.body);
     Array.prototype.push.apply(occupiedPositions, snake.shitTrail);
     
     // Check snake occupied positions collision
@@ -94,11 +95,15 @@ function run() {
         }
     }
 
+    // Move Bug
+    bug.move();
+
     if (!isGameOver) {
         // if (isFruitEaten) {
         //     console.log('Number of free positions: ' + gamePlane.freePositions.length);
         //     console.log('Number of occupied positions: ' + occupiedPositions.length);
         // }
+
         // Draw all game items
         gamePlane.draw();
         fruit.draw();

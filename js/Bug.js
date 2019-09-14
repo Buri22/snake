@@ -2,14 +2,14 @@ class Bug extends Moveable {
     canvas = null;
     color = 'yellow';
     //body = [];
-    length = 0;
-    width = 0;
+    //length = 0;
+    width = null;
     //headPosition = null;
 
-    constructor(canvasId, initialPosition, initialWidth) {
+    constructor(canvas, initialPosition, initialWidth) {
         super(initialPosition, [initialPosition], Math.floor(Math.random() * 3) + 1, DIRECTION.right);
 
-        this.canvas = document.getElementById(canvasId).getContext('2d');
+        this.canvas = canvas;
         //this.length = Math.floor(Math.random() * 3) + 1;
         //this.headPosition = initialPosition;
         this.width = initialWidth;
@@ -21,18 +21,19 @@ class Bug extends Moveable {
         //this.body.push(this.headPosition);
     }
 
-    // move(newHeadPosition) {
-    //     while (this.body.length >= this.length) {
-    //         this.body.shift();
-    //     }
-
-    //     this.body.push(newHeadPosition);
-
-    //     // Set new head position
-    //     this.headPosition = newHeadPosition;
-
-    //     return result;
-    // }
+    move() {
+        if (this.doChangeDirection()) {
+            super.changeDirection({keyCode: Math.floor(Math.random() * 4) + 37});
+        }
+        if (this.isMoveTurn()) {
+            let newHeadPosition = super.getNextHeadPosition();
+            return super.move(newHeadPosition);
+        }
+        else {
+            this.moveIndex++;
+            return false;
+        }
+    }
 
     draw() {
         this.canvas.fillStyle = this.color;
@@ -40,6 +41,16 @@ class Bug extends Moveable {
             this.canvas.fillRect(item.x * this.width, item.y * this.width, 
                 this.width - 2, this.width - 2);
         });
+    }
+
+    doChangeDirection() {
+        if (this.moveIndex % 5 == 0) return true;
+        return false;
+    }
+
+    isMoveTurn() {
+        if (this.moveIndex % 3 == 0) return true;
+        return false;
     }
 
     isEaten(position) {

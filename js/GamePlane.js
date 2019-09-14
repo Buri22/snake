@@ -1,7 +1,6 @@
 class GamePlane {
     // Properties
     canvas = null;
-    canvasId = '';
     canvasWidth = null;
     canvasHeight = null;
     gridSize = null;
@@ -9,19 +8,15 @@ class GamePlane {
     bgColor = 'black';
     freePositions = [];
 
-    constructor (canvasId, gridSize, tileSize) {
-        this.canvasId = canvasId;
+    constructor (canvas, gridSize, tileSize) {
         this.gridSize = gridSize;
         this.tileSize = tileSize;
         this.canvasHeight = this.canvasWidth = gridSize * tileSize;
 
-        // Set canvas Width and Height
-        $('#' + this.canvasId)
-            .attr('width', this.canvasWidth)
-            .attr('height', this.canvasHeight);
-
         // Get canvas context
-        this.canvas = document.getElementById(this.canvasId).getContext('2d');
+        this.canvas = canvas;
+        this.canvas.canvas.width = this.canvasWidth;
+        this.canvas.canvas.height = this.canvasHeight;
 
         // Set freePositions array
         for (let index = 0; index < gridSize * gridSize; index++) {

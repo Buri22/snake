@@ -6,10 +6,10 @@ class Snake extends Moveable {
     speed = 150;                    // in milliseconds
     canvas = null;
 
-    constructor (initialTrail, initialWidth, canvasId) {
+    constructor (initialTrail, initialWidth, canvas) {
         super(initialTrail[initialTrail.length - 1], initialTrail, initialTrail.length, DIRECTION.down); // Define initial head position and direction
         
-        this.canvas = document.getElementById(canvasId).getContext('2d');
+        this.canvas = canvas;
         this.width = initialWidth;
 
         window.addEventListener('keydown', this.changeDirection.bind(this));

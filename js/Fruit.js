@@ -7,13 +7,14 @@ class Fruit {
     width = null;
     canvas = null;
 
-    constructor (maxX, maxY, width, height, canvasId, initialPosition) {
+    constructor (maxX, maxY, width, height, canvas, initialPosition) {
         this.maxX = maxX;
         this.maxY = maxY;
         this.width = width;
         this.height = height;
-        this.canvas = document.getElementById(canvasId).getContext('2d');
+        this.canvas = canvas;
         this.position = initialPosition;
+        
         //this.getNewPosition();
         this.draw();
     }
