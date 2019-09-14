@@ -55,24 +55,69 @@ class GamePlane {
     }
     
     getFreePosition() {
-        return this.freePositions[Math.floor(Math.random() * this.freePositions.length)];
+        let index = Math.floor(Math.random() * this.freePositions.length);
+        return {
+            index: index,
+            position: this.freePositions[index]
+        };
     }
+    // getFreePositions(number) {
+    //     let initialPositionResult = this.getFreePosition();
+    //     let initialPosition = initialPositionResult.position;
 
+    //     if (!isNaN(number) || number < 1) {
+    //         console.log('Invalid argument for getFreePositions...');
+    //         return false;
+    //     }
+    //     else if (number == 1) {
+    //         return initialPosition;
+    //     }
+    //     else if (number > 1) {
+    //         let result = [initialPositionResult.index];            
+    //         let previousPosition = initialPosition;
+
+    //         for (let i = 1; i < number; i++) {
+    //             let possibleNextPosition = {
+    //                 x: previousPosition.x, 
+    //                 y: previousPosition.y
+    //             };
+
+    //         }
+
+    //         return result;
+    //     }
+    // }
+
+    // Returns true if removal was successfull, otherwise returns false
     removeFreePosition(position) {
         for (let i = this.freePositions.length - 1; i >= 0; --i) {
-            if (this.freePositions[i].x == position.x && this.freePositions[i].y == position.y) {
-                this.freePositions.splice(i, 1);
-                break;
+            if (this.removeFreePositionByIndex(i, position)) {
+                return true;
             }
         }
+        return false;
+    }
+    removeFreePositionByIndex(index, position) {
+        if (this.freePositions[index].x == position.x 
+            && this.freePositions[index].y == position.y) {
+            this.freePositions.splice(index, 1);
+            return true;
+        }
+        return false;
     }
 
-    isPositionFree() {
-        let result = false;
-
-
-
-        return result;
+    isPositionFree(position) {
+        for (const index in this.freePositions) {
+            if (this.freePositions.hasOwnProperty(index) 
+                && this.freePositions[index].x == position.x 
+                && this.freePositions[index].y == position.y) {
+                return index;
+            }
+        }
+        // for (const item of this.freePositions) {
+        //     if (item.x == position.x && item.y == position.y) { return true; }
+        // }
+        return false;
     }
 
     getInfiniteNextPosition(position) {

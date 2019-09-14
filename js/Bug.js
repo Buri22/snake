@@ -1,22 +1,38 @@
-class Bug {
+class Bug extends Moveable {
     canvas = null;
     color = 'yellow';
-    body = [];
+    //body = [];
     length = 0;
     width = 0;
-    headPosition = null;
+    //headPosition = null;
 
     constructor(canvasId, initialPosition, initialWidth) {
+        super(initialPosition, [initialPosition], Math.floor(Math.random() * 3) + 1, DIRECTION.right);
+
         this.canvas = document.getElementById(canvasId).getContext('2d');
-        this.length = Math.floor(Math.random() * 3) + 1;
-        this.headPosition = initialPosition;
+        //this.length = Math.floor(Math.random() * 3) + 1;
+        //this.headPosition = initialPosition;
         this.width = initialWidth;
         
         // Initialize body for the given length and initial position
-        for (let index = 0; index < this.length; index++) {
-            this.body.unshift({x: this.headPosition.x - index, y: this.headPosition.y});
-        }
+        // for (let index = 0; index < this.length; index++) {
+        //     this.body.unshift({x: this.headPosition.x - index, y: this.headPosition.y});
+        // }
+        //this.body.push(this.headPosition);
     }
+
+    // move(newHeadPosition) {
+    //     while (this.body.length >= this.length) {
+    //         this.body.shift();
+    //     }
+
+    //     this.body.push(newHeadPosition);
+
+    //     // Set new head position
+    //     this.headPosition = newHeadPosition;
+
+    //     return result;
+    // }
 
     draw() {
         this.canvas.fillStyle = this.color;

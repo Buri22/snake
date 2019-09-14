@@ -1,4 +1,8 @@
 //import GamePlane from "GamePlane";
+
+// Constants
+const DIRECTION = {up: 1, right: 2, down: 3, left: 4};
+
 // Global variables
 var gamePlane = null;
 var snake = null;
@@ -14,13 +18,14 @@ $(document).ready(function() {
     let canvasId = 'canvas';
     let gridSize = 25;
     let tileSize = 15;
+    let snakeInitialLength = 3;
 
     // Prepare environment
     gamePlane = new GamePlane(canvasId, gridSize, tileSize);
-    snakeTrail = gamePlane.freePositions.splice(gamePlane.freePositions.length / 2 - 3, 3);
+    let snakeTrail = gamePlane.freePositions.splice(gamePlane.freePositions.length / 2 - snakeInitialLength, snakeInitialLength);
     snake = new Snake(snakeTrail, tileSize, canvasId);
-    fruit = new Fruit(gridSize, gridSize, tileSize, tileSize, canvasId, gamePlane.getFreePosition());
-    bug = new Bug(canvasId, gamePlane.getFreePosition(), tileSize);
+    fruit = new Fruit(gridSize, gridSize, tileSize, tileSize, canvasId, gamePlane.getFreePosition().position);
+    bug = new Bug(canvasId, gamePlane.getFreePosition().position, tileSize);
 
     // Start the game
     isGameOver = false;
@@ -53,10 +58,14 @@ function run() {
     for (const item of occupiedPositions) {
         if (item.x == nextPosition.x && item.y == nextPosition.y) { gameOver(); break; }
     }
+    
+    // Remove newHeadPosition from free positions array
+    let removeFreePositionResult = gamePlane.removeFreePosition(nextPosition);
+    if (!removeFreePositionResult) console.log('New snake head position failed to remove from free positions...');
 
     let isFruitEaten = fruit.isEaten(nextPosition);
     if (isFruitEaten) {
-        fruit.setNewPosition(gamePlane.getFreePosition());
+        fruit.setNewPosition(gamePlane.getFreePosition().position);
         snake.increaseLength();
 
         // Check the snake speed change
@@ -75,9 +84,6 @@ function run() {
         snake.increaseLength();
         console.log('Bug was eaten!!');
     }
-    
-    // Remove newHeadPosition from free positions array
-    gamePlane.removeFreePosition(nextPosition);
 
     // Move snake
     let snakeMoveResult = snake.move(nextPosition);
@@ -106,6 +112,7 @@ function run() {
 }
 
 function toggleGamePause(event) {
+    // Listen for key P
     if (event.keyCode == 80) {
         if (gamePause) {
             gamePause = false;
