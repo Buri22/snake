@@ -1,32 +1,28 @@
 class Bug extends Moveable {
     canvas = null;
     color = 'yellow';
-    //body = [];
-    //length = 0;
     width = null;
-    //headPosition = null;
 
     constructor(canvas, initialPosition, initialWidth) {
         super(initialPosition, [initialPosition], Math.floor(Math.random() * 3) + 1, DIRECTION.right);
 
         this.canvas = canvas;
-        //this.length = Math.floor(Math.random() * 3) + 1;
-        //this.headPosition = initialPosition;
         this.width = initialWidth;
-        
-        // Initialize body for the given length and initial position
-        // for (let index = 0; index < this.length; index++) {
-        //     this.body.unshift({x: this.headPosition.x - index, y: this.headPosition.y});
-        // }
-        //this.body.push(this.headPosition);
     }
 
     move() {
         if (this.doChangeDirection()) {
-            super.changeDirection({keyCode: Math.floor(Math.random() * 4) + 37});
+            let previous = this.direction - 1 < 1 ? 40 : this.direction + 35;
+            let next = this.direction + 1 > 4 ? 37 : this.direction + 37;
+            let possibleKeys = [previous, this.direction + 36, next];
+            super.changeDirection({keyCode: possibleKeys[Math.floor(Math.random() * 3)]});
         }
         if (this.isMoveTurn()) {
             let newHeadPosition = super.getNextHeadPosition();
+
+            // Make checks if bug can move in this direction
+
+
             return super.move(newHeadPosition);
         }
         else {
@@ -38,7 +34,7 @@ class Bug extends Moveable {
     draw() {
         this.canvas.fillStyle = this.color;
         this.body.forEach(item => {
-            this.canvas.fillRect(item.x * this.width, item.y * this.width, 
+            this.canvas.fillRect(item.x * this.width + 1, item.y * this.width + 1, 
                 this.width - 2, this.width - 2);
         });
     }

@@ -38,7 +38,13 @@ class GamePlane {
     draw() {
         // draw background
         this.canvas.fillStyle = this.bgColor;
-        this.canvas.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+        // this.canvas.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+        
+        // draw all free positions
+        this.freePositions.forEach(item => {
+            this.canvas.fillRect(item.x * this.tileSize, item.y * this.tileSize, 
+                this.tileSize, this.tileSize);
+        });
     }
 
     positionIsOutside(position) {

@@ -14,7 +14,7 @@ class Fruit {
         this.height = height;
         this.canvas = canvas;
         this.position = initialPosition;
-        
+
         //this.getNewPosition();
         this.draw();
     }
@@ -31,7 +31,7 @@ class Fruit {
 
     draw() {
         this.canvas.fillStyle = this.color;
-        this.canvas.fillRect(this.position.x * this.width, this.position.y * this.height, 
+        this.canvas.fillRect(this.position.x * this.width + 1, this.position.y * this.height + 1, 
             this.width - 2, this.height - 2);
     }
 

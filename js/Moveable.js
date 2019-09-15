@@ -30,7 +30,7 @@ class Moveable {
         // Set new head position
         this.headPosition = newHeadPosition;
 
-        //this.moveIndex++;
+        this.moveIndex++;
         return result;
     }
     
@@ -57,14 +57,13 @@ class Moveable {
 
         // Check current move directionsStack
         if (newDirection != 0) {
-            if (this.directionsStack[this.moveIndex + 1] == undefined) {
+            if (this.directionsStack[this.moveIndex] == undefined) {
                 this.directionsStack.length = 0;
-                this.directionsStack[this.moveIndex + 1] = newDirection;
+                this.directionsStack[this.moveIndex] = newDirection;
                 this.direction = newDirection;
-            } else if(this.directionsStack[this.moveIndex + 1] != newDirection) {
-                this.directionsStack[this.moveIndex + 2] = newDirection;
+            } else if(this.directionsStack[this.moveIndex] != newDirection) {
+                this.directionsStack[this.moveIndex + 1] = newDirection;
             }
-            //console.log('Direction was changed');
         }
     }
 
@@ -73,7 +72,6 @@ class Moveable {
             x: this.headPosition.x,
             y: this.headPosition.y
         };
-        this.moveIndex++;
 
         if (this.directionsStack[this.moveIndex] != undefined) {
             this.direction = this.directionsStack[this.moveIndex];
@@ -96,7 +94,7 @@ class Moveable {
             default:
                 break;
         }
-        //console.log(this.direction);
+        
         return result;
     }
 

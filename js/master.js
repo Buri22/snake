@@ -1,7 +1,7 @@
 //import GamePlane from "GamePlane";
 
 // Constants
-const DIRECTION = {up: 1, right: 2, down: 3, left: 4};
+const DIRECTION = {left: 1, up: 2, right: 3, down: 4};
 
 // Global variables
 var gamePlane = null;
@@ -15,7 +15,6 @@ var gamePause = false;
 
 $(document).ready(function() {
     // Variables
-    //let canvasId = 'canvas';
     let canvas = document.getElementById('canvas').getContext('2d');
     let gridSize = 25;
     let tileSize = 15;

@@ -33,8 +33,6 @@ class Snake extends Moveable {
         // Draw the snake
         this.canvas.fillStyle = this.color;
         this.body.forEach(item => {
-            // this.canvas.fillRect(item.x * this.width, item.y * this.width, 
-            //     this.width - 2, this.width - 2);
             this.canvas.fillRect(item.x * this.width, item.y * this.width, 
                 this.width, this.width);
         });
@@ -43,7 +41,7 @@ class Snake extends Moveable {
         this.canvas.fillStyle = this.shitColor;
         this.shitTrail.forEach(item => {
             this.canvas.fillRect(item.x * this.width, item.y * this.width, 
-                this.width - 2, this.width - 2);
+                this.width, this.width);
         });
     }
 
