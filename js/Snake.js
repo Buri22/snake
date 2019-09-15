@@ -45,14 +45,6 @@ class Snake extends Moveable {
         });
     }
 
-    increaseLength(x = 1) {
-        this.length += x;
-        console.log(this.length);
-    }
-    decreaseLength(x = 1) {
-        this.length -= x;
-    }
-
     doesMakeShit() {
         return this.shitTrail.length < Math.floor(this.body.length / 5) 
             && Math.floor(Math.random() * 100) < 25;

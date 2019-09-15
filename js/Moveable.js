@@ -98,4 +98,12 @@ class Moveable {
         return result;
     }
 
+
+    increaseLength(x = 1) {
+        this.length += x;
+        console.log(this.length);
+    }
+    decreaseLength(x = 1) {
+        this.length -= x;
+    }
 }

@@ -11,6 +11,7 @@ var bug = null;
 var gameCycle = null;
 var isGameOver = null;
 var gameCycleDurations = [];
+var itemsToDraw = [];
 var gamePause = false;
 
 $(document).ready(function() {
@@ -26,6 +27,8 @@ $(document).ready(function() {
     snake = new Snake(snakeTrail, tileSize, canvas);
     fruit = new Fruit(gridSize, gridSize, tileSize, tileSize, canvas, gamePlane.getFreePosition().position);
     bug = new Bug(canvas, gamePlane.getFreePosition().position, tileSize);
+
+    itemsToDraw = [gamePlane, snake, fruit, bug];
 
     // Start the game
     isGameOver = false;
@@ -49,18 +52,11 @@ function run() {
         //nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
     }
 
-    // Iterate through all occupied positions and make all checks for each of them
-    let occupiedPositions = [];
-    Array.prototype.push.apply(occupiedPositions, snake.body);
-    Array.prototype.push.apply(occupiedPositions, snake.shitTrail);
-    
-    // Check snake occupied positions collision
-    for (const item of occupiedPositions) {
-        if (item.x == nextPosition.x && item.y == nextPosition.y) { gameOver(); break; }
-    }
+    let nextPositionIsFreeResult = gamePlane.isPositionFree(nextPosition);
+    if (nextPositionIsFreeResult == false) { gameOver(); return; }
     
     // Remove newHeadPosition from free positions array
-    let removeFreePositionResult = gamePlane.removeFreePosition(nextPosition);
+    let removeFreePositionResult = gamePlane.removeFreePositionByIndex(nextPositionIsFreeResult, nextPosition);
     if (!removeFreePositionResult) console.log('New snake head position failed to remove from free positions...');
 
     let isFruitEaten = fruit.isEaten(nextPosition);
@@ -82,7 +78,9 @@ function run() {
     let isBugEaten = bug.isEaten(nextPosition);
     if (isBugEaten) {
         snake.increaseLength();
-        console.log('Bug was eaten!!');
+        if (bug.length == 0) {
+            console.log('Bug was eaten!!');
+        }
     }
 
     // Move snake
@@ -104,15 +102,20 @@ function run() {
         // }
 
         // Draw all game items
-        gamePlane.draw();
-        fruit.draw();
-        bug.draw();
-        snake.draw();
+        for (const key in itemsToDraw) {
+            const item = itemsToDraw[key];
+            if (isBugEaten && typeof item == 'Bug' && item.length == 0) {
+                itemsToDraw.splice(key, 1);
+            }
+            else {
+                item.draw();
+            }
+        }
     }
     
     let endTime = performance.now();
     gameCycleDurations.push(endTime - startTime);
-    //console.log(`GameCycle took ${endTime - startTime}ms`);
+    console.log(`GameCycle took ${endTime - startTime}ms`);
 }
 
 function toggleGamePause(event) {
