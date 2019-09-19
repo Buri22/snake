@@ -62,32 +62,6 @@ class GamePlane {
             position: this.freePositions[index]
         };
     }
-    // getFreePositions(number) {
-    //     let initialPositionResult = this.getFreePosition();
-    //     let initialPosition = initialPositionResult.position;
-
-    //     if (!isNaN(number) || number < 1) {
-    //         console.log('Invalid argument for getFreePositions...');
-    //         return false;
-    //     }
-    //     else if (number == 1) {
-    //         return initialPosition;
-    //     }
-    //     else if (number > 1) {
-    //         let result = [initialPositionResult.index];            
-    //         let previousPosition = initialPosition;
-
-    //         for (let i = 1; i < number; i++) {
-    //             let possibleNextPosition = {
-    //                 x: previousPosition.x, 
-    //                 y: previousPosition.y
-    //             };
-
-    //         }
-
-    //         return result;
-    //     }
-    // }
 
     // Returns true if removal was successfull, otherwise returns false
     removeFreePosition(position) {
@@ -109,10 +83,9 @@ class GamePlane {
 
     isPositionFree(position) {
         for (const index in this.freePositions) {
-            if (this.freePositions.hasOwnProperty(index) 
-                && this.freePositions[index].x == position.x 
+            if (this.freePositions[index].x == position.x 
                 && this.freePositions[index].y == position.y) {
-                return index;
+                return Number(index);
             }
         }
         // for (const item of this.freePositions) {

@@ -17,7 +17,6 @@ var gameCycleDurations = [];
 var movingCreatures = [];
 var gamePause = false;
 var numberOfEatenApples = 0;
-var isBugInGame = false;
 
 $(document).ready(function() {
     // Variables
@@ -45,6 +44,7 @@ function run() {
     // Check the walls
     if (gamePlane.positionIsOutside(nextPosition)) { 
         // Game plane with walls
+        console.log('Next Snake head position is out of the Game Plane...', nextPosition);
         gameOver();
         return;
 
@@ -54,17 +54,38 @@ function run() {
 
     // Check nextPosition is free
     let nextPositionIsFreeResult = gamePlane.isPositionFree(nextPosition);
-    if (nextPositionIsFreeResult == false) { gameOver(); return; }
+    if (nextPositionIsFreeResult === false) {
+        console.log('Next Snake head position is not free...', nextPosition);
+        gameOver();
+        return;
+    }
     
     // Remove newHeadPosition from free positions array
     let removeFreePositionResult = gamePlane.removeFreePositionByIndex(nextPositionIsFreeResult, nextPosition);
-    if (!removeFreePositionResult) console.log('New snake head position failed to remove from free positions...');
+    if (!removeFreePositionResult) console.log('New Snake head position failed to remove from free positions...', nextPosition);
 
     let isFruitEaten = fruit.isEaten(nextPosition);
     if (isFruitEaten) {
         fruit.setNewPosition(gamePlane.getFreePosition().position);
         snake.increaseLength();
         numberOfEatenApples++;
+        console.log('Number of eaten apples: ' + numberOfEatenApples);
+        
+        // Check number of eaten apples to create bug
+        if (numberOfEatenApples % 5 == 0) {
+            let numberOfBugs = 0;
+            let bug = new Bug(canvas, TILE_SIZE);
+            for (const creature of movingCreatures) {
+                if (creature instanceof Bug) { numberOfBugs++; }
+            }
+            //if (numberOfBugs > 0 && numberOfBugs % 2 == 0) {
+            if (numberOfBugs % 2 == 0) {
+                // Create poisoned bug
+                bug = new CleverBug(canvas, TILE_SIZE);
+            }
+            movingCreatures.push(bug);
+            console.log('New Bug is in the game!');
+        }
     }
 
     let isCreatureEaten = false;
@@ -91,13 +112,6 @@ function run() {
             clearInterval(gameCycle);
             gameCycle = setInterval(run, snake.speed);
         }
-        // Check number of aten apples to create bug
-        if (!isBugInGame && numberOfEatenApples % 5 == 0) {
-            let bug = new Bug(canvas, gamePlane.getFreePosition().position, TILE_SIZE);
-            movingCreatures.push(bug);
-            isBugInGame = true;
-            console.log('Bug is in the game!');
-        }
     }
 
     // Move snake
@@ -123,7 +137,6 @@ function run() {
             const item = movingCreatures[key];
             if (isCreatureEaten && item instanceof Bug && item.length == 0) {
                 movingCreatures.splice(key, 1);
-                isBugInGame = false;
                 console.log('Bug was eaten!');
             }
             else {

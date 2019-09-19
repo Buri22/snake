@@ -2,8 +2,11 @@ class Bug extends Moveable {
     canvas = null;
     color = 'yellow';
     width = null;
+    moveTurnRate = 3;
+    changeDirectionRate = 5;
 
-    constructor(canvas, initialPosition, initialWidth) {
+    constructor(canvas, initialWidth) {
+        let initialPosition = gamePlane.getFreePosition().position;
         super(initialPosition, [initialPosition], Math.floor(Math.random() * 3) + 1, DIRECTION.right);
 
         this.canvas = canvas;
@@ -12,27 +15,46 @@ class Bug extends Moveable {
 
     move() {
         if (this.length > 0) {
-            if (this.doChangeDirection()) {
-                // Calculate possible direction changes
-                let previous = this.direction - 1 < 1 ? 40 : this.direction + 35;
-                let next = this.direction + 1 > 4 ? 37 : this.direction + 37;
-                let possibleKeys = [previous, this.direction + 36, next];
-                super.changeDirection({keyCode: possibleKeys[Math.floor(Math.random() * 3)]});
+            if (this.doAction(this.changeDirectionRate)) {
+                this.changeDirectionRandomly();
             }
             // Check if bug is going to move this turn
-            if (this.isMoveTurn()) {
+            if (this.doAction(this.moveTurnRate)) {
                 let newHeadPosition = super.getNextHeadPosition();
-    
+                let isNewHeadPositionFree = gamePlane.isPositionFree(newHeadPosition);
+
                 // Make checks if bug can move in this direction
+                if (gamePlane.positionIsOutside(newHeadPosition)
+                    || isNewHeadPositionFree == false) {
+                    this.moveIndex++;
+                    return false;
+                }
+
+                // Check if fruit is eaten
+                if (fruit.isEaten(newHeadPosition)) {
+                    fruit.setNewPosition(gamePlane.getFreePosition().position);
+                    this.increaseLength();
+                    console.log('Bug eat fruit!', this);
+                }
     
-    
-                return super.move(newHeadPosition);
+                // Move
+                super.move(newHeadPosition);
+
+                return true;
             }
             else {
                 this.moveIndex++;
             }
         }
         return false;
+    }
+
+    changeDirectionRandomly() {
+        // Calculate possible direction changes
+        let previous = this.direction - 1 < 1 ? 40 : this.direction + 35;
+        let next = this.direction + 1 > 4 ? 37 : this.direction + 37;
+        let possibleKeys = [previous, this.direction + 36, next];
+        super.changeDirection({ keyCode: possibleKeys[Math.floor(Math.random() * 3)] });
     }
 
     draw() {
@@ -43,13 +65,8 @@ class Bug extends Moveable {
         });
     }
 
-    doChangeDirection() {
-        if (this.moveIndex % 5 == 0) return true;
-        return false;
-    }
-
-    isMoveTurn() {
-        if (this.moveIndex % 3 == 0) return true;
+    doAction(rate) {
+        if (this.moveIndex % rate == 0) return true;
         return false;
     }
 
@@ -58,7 +75,6 @@ class Bug extends Moveable {
             if (this.body[index].x == position.x && this.body[index].y == position.y) {
                 this.body.splice(index, 1);
                 this.length--;
-                console.log(this);
                 return true;
             }
         }
