@@ -37,6 +37,10 @@ class Bug extends Moveable {
                     fruit.setNewPosition(gamePlane.getFreePosition());
                     this.increaseLength();
                     console.log('Bug eat fruit!', this);
+
+                    if (this.length % 4 == 0) {
+                        movingCreatures.push(new CleverBug(canvas, TILE_SIZE));
+                    }
                 }
     
                 // Move

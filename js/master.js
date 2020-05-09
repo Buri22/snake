@@ -46,12 +46,12 @@ function run() {
     // Check the walls
     if (gamePlane.positionIsOutside(nextPosition)) { 
         // Game plane with walls
-        console.log('Next Snake head position is out of the Game Plane...', nextPosition);
-        gameOver();
-        return;
+        //console.log('Next Snake head position is out of the Game Plane...', nextPosition);
+        //gameOver();
+        //return;
 
         // Infinite Game plane
-        //nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
+        nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
     }
 
     // Check nextPosition is free
@@ -63,7 +63,7 @@ function run() {
     }
     
     // Remove newHeadPosition from free positions array
-    let removeFreePositionResult = gamePlane.removeFreePositionByIndex(nextPositionIsFreeResult, nextPosition);
+    let removeFreePositionResult = gamePlane.removeFreePosition(nextPosition);
     if (!removeFreePositionResult) console.log('New Snake head position failed to remove from free positions...', nextPosition);
 
     let isFruitEaten = fruit.isEaten(nextPosition);

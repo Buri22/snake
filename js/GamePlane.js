@@ -87,22 +87,15 @@ class GamePlane {
     }
 
     isPositionFree(position) {
-        for (const index in this.freePositions) {
-            if (this.freePositions[index].x == position.x 
-                && this.freePositions[index].y == position.y) {
-                return Number(index);
-            }
-        }
-        // for (const item of this.freePositions) {
-        //     if (item.x == position.x && item.y == position.y) { return true; }
-        // }
-        return false;
+        return this.freePositions.some(freePosition => 
+            freePosition.x === position.x 
+            && freePosition.y === position.y);
     }
 
     getInfiniteNextPosition(position) {
-        if (position.x < 0) { position.x = this.canvasWidth / this.tileSize }
+        if (position.x < 0) { position.x = this.canvasWidth / this.tileSize - 1 }
         else if (position.x >= this.canvasWidth / this.tileSize) { position.x = 0 }
-        else if (position.y < 0) { position.y = this.canvasHeight / this.tileSize }
+        else if (position.y < 0) { position.y = this.canvasHeight / this.tileSize - 1 }
         else if (position.y >= this.canvasHeight / this.tileSize) { position.y = 0 }
 
         return position;
