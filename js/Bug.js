@@ -23,10 +23,11 @@ class Bug extends Moveable {
             if (this.doAction(this.moveTurnRate)) {
                 let newHeadPosition = super.getNextHeadPosition();
                 let isNewHeadPositionFree = gamePlane.isPositionFree(newHeadPosition);
+                isNewHeadPositionFree = !this.isCreaturePosition(newHeadPosition);
 
                 // Make checks if bug can move in this direction
                 if (gamePlane.positionIsOutside(newHeadPosition)
-                    || isNewHeadPositionFree == false) {
+                    || isNewHeadPositionFree === false) {
                     this.moveIndex++;
                     return false;
                 }
@@ -79,6 +80,17 @@ class Bug extends Moveable {
                 this.body.splice(index, 1);
                 this.length--;
                 return true;
+            }
+        }
+        return false;
+    }
+
+    isCreaturePosition(position) {
+        for (const creature of movingCreatures) {
+            for (const bodyPosition of creature.body) {
+                if (bodyPosition.x === position.x && bodyPosition.y === position.y) {
+                    return true;
+                }
             }
         }
         return false;

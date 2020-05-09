@@ -7,67 +7,66 @@ class CleverBug extends Bug {
     }
 
     move() {
-        // Choose randomly by which coordinate (x/y) will the Bug get closer to the Fruit
-        if (Math.random() * 10 > 5) {
-            // Find direction toward the fruit
-            if (fruit.position.x != this.headPosition.x) {
-                if (fruit.position.x > this.headPosition.x) {
-                    // Go Right
-                    this.tryToGoInDirection(DIRECTION.right);
-                }
-                else {
-                    // Go Left
-                    this.tryToGoInDirection(DIRECTION.left);
-                }
-            }
+        let possibleDirections = this.getPossibleDirections();
+        if (possibleDirections.length === 1) {
+            // Creature has just one possible free direction => take it
+            this.direction = possibleDirections[0];
+            return super.move();
         }
-        else {
-            if (fruit.position.y != this.headPosition.y) {
-                if (fruit.position.y > this.headPosition.y) {
-                    // Go Down
-                    this.tryToGoInDirection(DIRECTION.down);
-                }
-                else {
-                    // Go Up
-                    this.tryToGoInDirection(DIRECTION.up);
-                }
-            }
-        }
+        else if (possibleDirections.length > 1) {
+            let directionsMovingCloser = this.getDirectionsMovingCloser();
+            let possibleDirectionGettingCloser = possibleDirections.filter(direction => directionsMovingCloser.includes(direction));
 
-        super.move();
+            if (possibleDirectionGettingCloser.length > 0) {
+                if (possibleDirectionGettingCloser.length === 1) {
+                    this.direction = possibleDirectionGettingCloser[0];
+                }
+                else {
+                    this.direction = possibleDirectionGettingCloser[Math.floor(Math.random() * 2)];
+                }
+                return super.move();
+            }
+
+            if (possibleDirections.length > 0) {
+                if (possibleDirections.length === 1) {
+                    this.direction = possibleDirections[0];
+                }
+                else {
+                    this.direction = possibleDirections[Math.floor(Math.random() * 2)];
+                }
+                return super.move();
+            }
+        }
+        return;
     }
 
-    tryToGoInDirection(direction) {
-        let newHeadPosition = {
-            x: this.headPosition.x, 
-            y: this.headPosition.y
-        };
-        switch (direction) {
-            case DIRECTION.left:
-                newHeadPosition.x--;
-                break;
-            case DIRECTION.up:
-                newHeadPosition.y--;
-                break;
-            case DIRECTION.right:
-                newHeadPosition.x++;
-                break;
-            case DIRECTION.down:
-                newHeadPosition.y++;
-                break;
-        
-            default:
-                break;
-        }
-        let isPositionFree = gamePlane.isPositionFree(newHeadPosition);
+    getPossibleDirections() {
+        return Object.values(DIRECTION).filter(direction => {
+            let newHeadPosition = this.getNextHeadPosition(direction);
+            return gamePlane.isPositionFree(newHeadPosition) 
+                && !this.isCreaturePosition(newHeadPosition);
+        });
+    }
 
-        if (isPositionFree == false) {
-            // Next head position is not free
-            super.changeDirectionRandomly();
+    // Find directions moving closer to the fruit
+    getDirectionsMovingCloser() {
+        let directionsMovingCloser = [];
+        if (fruit.position.x != this.headPosition.x) {
+            if (fruit.position.x > this.headPosition.x) {
+                directionsMovingCloser.push(DIRECTION.right);
+            }
+            else {
+                directionsMovingCloser.push(DIRECTION.left);
+            }
         }
-        else {
-            // No obstacle is in the way
-            this.direction = direction;
+        if (fruit.position.y != this.headPosition.y) {
+            if (fruit.position.y > this.headPosition.y) {
+                directionsMovingCloser.push(DIRECTION.down);
+            }
+            else {
+                directionsMovingCloser.push(DIRECTION.up);
+            }
         }
+        return directionsMovingCloser;
     }
 }

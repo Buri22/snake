@@ -15,16 +15,9 @@ class Fruit {
         this.canvas = canvas;
         this.position = initialPosition;
 
-        //this.getNewPosition();
         this.draw();
     }
 
-    // getNewPosition() {        
-    //     this.position.x = Math.floor(Math.random() * this.maxX);
-    //     this.position.y = Math.floor(Math.random() * this.maxY);
-
-    //     return this.position;
-    // }
     setNewPosition(position) {
         this.position = position;
     }

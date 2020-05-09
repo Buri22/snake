@@ -67,7 +67,7 @@ class Moveable {
         }
     }
 
-    getNextHeadPosition() {
+    getNextHeadPosition(direction = null) {
         let result = {
             x: this.headPosition.x,
             y: this.headPosition.y
@@ -77,7 +77,7 @@ class Moveable {
             this.direction = this.directionsStack[this.moveIndex];
         }
 
-        switch (this.direction) {
+        switch (direction || this.direction) {
             case DIRECTION.up:
                 result.y--;
                 break;

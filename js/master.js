@@ -45,12 +45,12 @@ function run() {
     // Check the walls
     if (gamePlane.positionIsOutside(nextPosition)) { 
         // Game plane with walls
-        console.log('Next Snake head position is out of the Game Plane...', nextPosition);
-        gameOver();
-        return;
+        // console.log('Next Snake head position is out of the Game Plane...', nextPosition);
+        // gameOver();
+        // return;
 
         // Infinite Game plane
-        //nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
+        nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
     }
 
     // Check nextPosition is free
@@ -73,17 +73,22 @@ function run() {
         console.log('Number of eaten apples: ' + numberOfEatenApples);
         
         // Check number of eaten apples to create bug
-        if (numberOfEatenApples % 5 == 0) {
+        if (numberOfEatenApples % 1 == 0) {
+            let bug;
+            // Count numberOfBasic Bugs
             let numberOfBugs = 0;
-            let bug = new Bug(canvas, TILE_SIZE);
             for (const creature of movingCreatures) {
                 if (creature instanceof Bug) { numberOfBugs++; }
             }
             //if (numberOfBugs > 0 && numberOfBugs % 2 == 0) {
             if (numberOfBugs % 2 == 0) {
-                // Create poisoned bug
+                // Create clever bug
                 bug = new CleverBug(canvas, TILE_SIZE);
             }
+            else {
+                bug = new Bug(canvas, TILE_SIZE);
+            }
+
             movingCreatures.push(bug);
             console.log('New Bug is in the game!');
         }
