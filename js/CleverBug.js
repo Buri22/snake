@@ -1,6 +1,4 @@
 class CleverBug extends Bug {
-    color = "#990099";
-
     constructor(canvas, initialWidth) {
         super(canvas, initialWidth);
 
@@ -10,7 +8,7 @@ class CleverBug extends Bug {
 
     move() {
         // Choose randomly by which coordinate (x/y) will the Bug get closer to the Fruit
-        if (Math.floor(Math.random() * 2) == 1) {
+        if (Math.random() * 10 > 5) {
             // Find direction toward the fruit
             if (fruit.position.x != this.headPosition.x) {
                 if (fruit.position.x > this.headPosition.x) {

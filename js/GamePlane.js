@@ -5,7 +5,7 @@ class GamePlane {
     canvasHeight = null;
     gridSize = null;
     tileSize = null;
-    bgColor = 'black';
+    bgColor = '#000';
     freePositions = [];
 
     constructor (canvas, gridSize, tileSize) {

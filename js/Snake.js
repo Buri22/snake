@@ -1,5 +1,5 @@
 class Snake extends Moveable {
-    color = 'lime';
+    color = '#0f0';
     shitColor = '#663300';
     width = null;
     shitTrail = [];

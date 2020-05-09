@@ -1,5 +1,5 @@
 class Fruit {
-    color = 'red';
+    color = '#ff0707';
     position = {x: null, y: null};
     maxX = null;
     maxY = null;

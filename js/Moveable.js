@@ -37,16 +37,16 @@ class Moveable {
     changeDirection(event) {
         let newDirection = null;
         switch (event.keyCode) {
-            case 37:
+            case ARROW_KEY_CODES.left:
                 newDirection = DIRECTION.left;
                 break;
-            case 38:
+            case ARROW_KEY_CODES.up:
                 newDirection = DIRECTION.up;
                 break;
-            case 39:
+            case ARROW_KEY_CODES.right:
                 newDirection = DIRECTION.right;
                 break;
-            case 40:
+            case ARROW_KEY_CODES.down:
                 newDirection = DIRECTION.down;
                 break;
         }

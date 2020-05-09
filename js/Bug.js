@@ -1,6 +1,6 @@
 class Bug extends Moveable {
     canvas = null;
-    color = 'yellow';
+    color = null;
     width = null;
     moveTurnRate = 3;
     changeDirectionRate = 5;
@@ -11,6 +11,7 @@ class Bug extends Moveable {
 
         this.canvas = canvas;
         this.width = initialWidth;
+        this.color = this.getRandomColor();
     }
 
     move() {
@@ -50,11 +51,13 @@ class Bug extends Moveable {
     }
 
     changeDirectionRandomly() {
-        // Calculate possible direction changes
-        let previous = this.direction - 1 < 1 ? 40 : this.direction + 35;
-        let next = this.direction + 1 > 4 ? 37 : this.direction + 37;
-        let possibleKeys = [previous, this.direction + 36, next];
-        super.changeDirection({ keyCode: possibleKeys[Math.floor(Math.random() * 3)] });
+        // Filter out opposite direction arrow key code
+        let possibleKeys = Object.values(ARROW_KEY_CODES)
+            .filter(direction => !this.areOppositeDirections(this.direction + 36, direction));
+
+        super.changeDirection({ 
+            keyCode: possibleKeys[Math.floor(Math.random() * 3)]
+        });
     }
 
     draw() {
@@ -81,4 +84,20 @@ class Bug extends Moveable {
         return false;
     }
 
+    getRandomColor() {
+        let letters = '0123456789ABCDEF';
+        let color = '';
+        do {
+            color = '#';
+            for (let i = 0; i < 6; i++) {
+              color += letters[Math.floor(Math.random() * letters.length)];
+            }
+        }
+        while (color === gamePlane.bgColor
+            || color === snake.color
+            || color === snake.shitColor
+            || color === fruit.color)
+
+        return color;
+    }
 }
