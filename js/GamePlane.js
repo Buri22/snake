@@ -56,11 +56,16 @@ class GamePlane {
     }
     
     getFreePosition() {
-        let index = Math.floor(Math.random() * this.freePositions.length);
-        return {
-            index: index,
-            position: this.freePositions[index]
-        };
+        // Filter-out moving creatures
+        let freePositions = this.freePositions
+            .filter(freePosition => !movingCreatures
+                .map(mc => mc.body)
+                .flat()
+                .some(creaturePosition => 
+                    creaturePosition.x === freePosition.x
+                    && creaturePosition.y === freePosition.y)
+            );
+        return freePositions[Math.floor(Math.random() * freePositions.length)];
     }
 
     // Returns true if removal was successfull, otherwise returns false

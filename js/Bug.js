@@ -6,7 +6,7 @@ class Bug extends Moveable {
     changeDirectionRate = 5;
 
     constructor(canvas, initialWidth) {
-        let initialPosition = gamePlane.getFreePosition().position;
+        let initialPosition = gamePlane.getFreePosition();
         super(initialPosition, [initialPosition], Math.floor(Math.random() * 3) + 1, DIRECTION.right);
 
         this.canvas = canvas;
@@ -34,7 +34,7 @@ class Bug extends Moveable {
 
                 // Check if fruit is eaten
                 if (fruit.isEaten(newHeadPosition)) {
-                    fruit.setNewPosition(gamePlane.getFreePosition().position);
+                    fruit.setNewPosition(gamePlane.getFreePosition());
                     this.increaseLength();
                     console.log('Bug eat fruit!', this);
                 }

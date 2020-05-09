@@ -28,7 +28,8 @@ $(document).ready(function() {
     gamePlane = new GamePlane(canvas, GRID_SIZE, TILE_SIZE);
     let snakeTrail = gamePlane.freePositions.splice(gamePlane.freePositions.length / 2 - snakeInitialLength, snakeInitialLength);
     snake = new Snake(snakeTrail, TILE_SIZE, canvas);
-    fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, canvas, gamePlane.getFreePosition().position);
+    fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, canvas, gamePlane.getFreePosition());
+    movingCreatures.push(new CleverBug(canvas, TILE_SIZE));
 
     // Start the game
     isGameOver = false;
@@ -45,12 +46,12 @@ function run() {
     // Check the walls
     if (gamePlane.positionIsOutside(nextPosition)) { 
         // Game plane with walls
-        // console.log('Next Snake head position is out of the Game Plane...', nextPosition);
-        // gameOver();
-        // return;
+        console.log('Next Snake head position is out of the Game Plane...', nextPosition);
+        gameOver();
+        return;
 
         // Infinite Game plane
-        nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
+        //nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
     }
 
     // Check nextPosition is free
@@ -67,21 +68,15 @@ function run() {
 
     let isFruitEaten = fruit.isEaten(nextPosition);
     if (isFruitEaten) {
-        fruit.setNewPosition(gamePlane.getFreePosition().position);
+        fruit.setNewPosition(gamePlane.getFreePosition());
         snake.increaseLength();
         numberOfEatenApples++;
         console.log('Number of eaten apples: ' + numberOfEatenApples);
         
         // Check number of eaten apples to create bug
-        if (numberOfEatenApples % 1 == 0) {
-            let bug;
-            // Count numberOfBasic Bugs
-            let numberOfBugs = 0;
-            for (const creature of movingCreatures) {
-                if (creature instanceof Bug) { numberOfBugs++; }
-            }
-            //if (numberOfBugs > 0 && numberOfBugs % 2 == 0) {
-            if (numberOfBugs % 2 == 0) {
+        if (numberOfEatenApples % 5 == 0) {
+            let bug;            
+            if (movingCreatures.length % 1 == 0) {
                 // Create clever bug
                 bug = new CleverBug(canvas, TILE_SIZE);
             }
