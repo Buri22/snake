@@ -1,22 +1,22 @@
 //import GamePlane from "GamePlane";
 
 // Constants
-const DIRECTION = {left: 1, up: 2, right: 3, down: 4};
+const DIRECTION = Object.freeze({left: 1, up: 2, right: 3, down: 4});
 const TILE_SIZE = 15;
 const GRID_SIZE = 25;
 
 // Global variables
-var canvas = null;
-var gamePlane = null;
-var snake = null;
-var fruit = null;
-var bug = null;
-var gameCycle = null;
-var isGameOver = null;
-var gameCycleDurations = [];
-var movingCreatures = [];
-var gamePause = false;
-var numberOfEatenApples = 0;
+var canvas = null,
+    gamePlane = null,
+    snake = null,
+    fruit = null,
+    bug = null,
+    gameCycle = null,
+    isGameOver = null,
+    gameCycleDurations = [],
+    movingCreatures = [],
+    gamePause = false,
+    numberOfEatenApples = 0;
 
 $(document).ready(function() {
     // Variables

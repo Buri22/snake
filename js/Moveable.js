@@ -14,7 +14,7 @@ class Moveable {
     }
     
     // Input => new head position
-    // Returns => new free position or shit position
+    // Returns => new free position or shit position (not free ;)
     move(newHeadPosition) {
         let result = {
             position: null,
@@ -35,7 +35,7 @@ class Moveable {
     }
     
     changeDirection(event) {
-        let newDirection;
+        let newDirection = null;
         switch (event.keyCode) {
             case 37:
                 newDirection = DIRECTION.left;
@@ -49,20 +49,20 @@ class Moveable {
             case 40:
                 newDirection = DIRECTION.down;
                 break;
-        
-            default:
-                newDirection = 0;
-                break;
         }
 
         // Check current move directionsStack
-        if (newDirection != 0) {
-            if (this.directionsStack[this.moveIndex] == undefined) {
+        if (newDirection != null) {
+            if (this.directionsStack[this.moveIndex] == undefined
+                && this.direction != newDirection
+                && !this.areOppositeDirections(this.direction, newDirection)) {
                 this.directionsStack.length = 0;
                 this.directionsStack[this.moveIndex] = newDirection;
                 this.direction = newDirection;
-            } else if(this.directionsStack[this.moveIndex] != newDirection) {
-                this.directionsStack[this.moveIndex + 1] = newDirection;
+            }
+            else if (!this.areOppositeDirections(this.directionsStack[this.directionsStack.length - 1], newDirection))
+            {
+                this.directionsStack.push(newDirection);
             }
         }
     }
@@ -90,9 +90,6 @@ class Moveable {
             case DIRECTION.right:
                 result.x++;
                 break;
-        
-            default:
-                break;
         }
         
         return result;
@@ -105,5 +102,14 @@ class Moveable {
     }
     decreaseLength(x = 1) {
         this.length -= x;
+    }
+
+    areOppositeDirections(direction1, direction2) {
+        if (direction1 <= 2) {
+            return direction1 + 2 === direction2;
+        }
+        else {
+            return direction1 - 2 === direction2;
+        }
     }
 }
