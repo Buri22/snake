@@ -7,11 +7,13 @@ class GamePlane {
     tileSize = null;
     bgColor = '#000';
     freePositions = [];
+    mode = null;
 
-    constructor (canvas, gridSize, tileSize) {
+    constructor (canvas, gridSize, tileSize, mode) {
         this.gridSize = gridSize;
         this.tileSize = tileSize;
         this.canvasHeight = this.canvasWidth = gridSize * tileSize;
+        this.mode = mode;
 
         // Get canvas context
         this.canvas = canvas;

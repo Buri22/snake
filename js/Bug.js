@@ -1,17 +1,17 @@
-class Bug extends Moveable {
-    canvas = null;
-    color = null;
-    width = null;
+class Bug extends Creature {
     moveTurnRate = 3;
     changeDirectionRate = 5;
 
     constructor(canvas, initialWidth) {
         let initialPosition = gamePlane.getFreePosition();
-        super(initialPosition, [initialPosition], Math.floor(Math.random() * 3) + 1, DIRECTION.right);
-
-        this.canvas = canvas;
-        this.width = initialWidth;
-        this.color = this.getRandomColor();
+        super(
+            initialPosition
+            , [initialPosition]
+            , Math.floor(Math.random() * 3) + 1
+            , initialWidth
+            , DIRECTION.down
+            , canvas
+        );
     }
 
     move() {
@@ -98,22 +98,5 @@ class Bug extends Moveable {
             }
         }
         return false;
-    }
-
-    getRandomColor() {
-        let letters = '0123456789ABCDEF';
-        let color = '';
-        do {
-            color = '#';
-            for (let i = 0; i < 6; i++) {
-              color += letters[Math.floor(Math.random() * letters.length)];
-            }
-        }
-        while (color === gamePlane.bgColor
-            || color === snake.color
-            || color === snake.shitColor
-            || color === fruit.color)
-
-        return color;
     }
 }

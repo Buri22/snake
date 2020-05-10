@@ -1,23 +1,23 @@
-class Snake extends Moveable {
-    color = '#0f0';
+class Snake extends Creature {
     shitColor = '#663300';
-    width = null;
     shitTrail = [];
-    speed = 150;                    // in milliseconds
-    canvas = null;
+    speed = 150;    // in milliseconds
 
     constructor (initialTrail, initialWidth, canvas) {
-        super(initialTrail[initialTrail.length - 1], initialTrail, initialTrail.length, DIRECTION.down); // Define initial head position and direction
-        
-        this.canvas = canvas;
-        this.width = initialWidth;
+        super(
+            initialTrail[initialTrail.length - 1]
+            , initialTrail
+            , initialTrail.length
+            , initialWidth
+            , DIRECTION.down
+            , canvas
+            , '#0f0'
+        );
 
         window.addEventListener('keydown', this.changeDirection.bind(this));
-
-        this.draw();
     }
 
-    // Override parent move()
+    // Override parent move() to create some shit
     move(newHeadPosition) {
         let result = super.move(newHeadPosition);
 

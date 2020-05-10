@@ -5,6 +5,7 @@ const DIRECTION = Object.freeze({left: 1, up: 2, right: 3, down: 4});
 const ARROW_KEY_CODES = Object.freeze({left: 37, up: 38, right: 39, down: 40});
 const TILE_SIZE = 15;
 const GRID_SIZE = 25;
+const GAME_PLANE_MODE = Object.freeze({infinite: 1, walls: 2});
 
 // Global variables
 var canvas = null,
@@ -16,16 +17,15 @@ var canvas = null,
     isGameOver = null,
     gameCycleDurations = [],
     movingCreatures = [],
-    gamePause = false,
-    numberOfEatenApples = 0;
+    gamePause = false;
 
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
     // Variables
     canvas = document.getElementById('canvas').getContext('2d');
     let snakeInitialLength = 3;
 
     // Prepare environment
-    gamePlane = new GamePlane(canvas, GRID_SIZE, TILE_SIZE);
+    gamePlane = new GamePlane(canvas, GRID_SIZE, TILE_SIZE, GAME_PLANE_MODE.infinite);
     let snakeTrail = gamePlane.freePositions.splice(gamePlane.freePositions.length / 2 - snakeInitialLength, snakeInitialLength);
     snake = new Snake(snakeTrail, TILE_SIZE, canvas);
     fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, canvas, gamePlane.getFreePosition());
@@ -44,14 +44,20 @@ function run() {
     let nextPosition = snake.getNextHeadPosition();
 
     // Check the walls
-    if (gamePlane.positionIsOutside(nextPosition)) { 
-        // Game plane with walls
-        //console.log('Next Snake head position is out of the Game Plane...', nextPosition);
-        //gameOver();
-        //return;
-
-        // Infinite Game plane
-        nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
+    if (gamePlane.positionIsOutside(nextPosition)) {
+        switch (gamePlane.mode) {
+            case GAME_PLANE_MODE.infinite:
+                // Infinite Game plane
+                nextPosition = gamePlane.getInfiniteNextPosition(nextPosition);
+                break;
+                
+            case GAME_PLANE_MODE.walls:
+            default:
+                // Game plane with walls
+                console.log('Next Snake head position is out of the Game Plane...', nextPosition);
+                gameOver();
+                return;
+        }
     }
 
     // Check nextPosition is free
@@ -70,11 +76,11 @@ function run() {
     if (isFruitEaten) {
         fruit.setNewPosition(gamePlane.getFreePosition());
         snake.increaseLength();
-        numberOfEatenApples++;
-        console.log('Number of eaten apples: ' + numberOfEatenApples);
+        snake.numberOfEaten.apples++;
+        console.log('Number of eaten apples: ' + snake.numberOfEaten.apples);
         
         // Check number of eaten apples to create bug
-        if (numberOfEatenApples % 5 == 0) {
+        if (snake.numberOfEaten.apples % 5 == 0) {
             let bug;            
             if (movingCreatures.length % 1 == 0) {
                 // Create clever bug
@@ -125,23 +131,18 @@ function run() {
     }
 
     if (!isGameOver) {
-        // if (isFruitEaten) {
-        //     console.log('Number of free positions: ' + gamePlane.freePositions.length);
-        //     console.log('Number of occupied positions: ' + occupiedPositions.length);
-        // }
-
         // Draw all game items
         gamePlane.draw();
         fruit.draw();
         snake.draw();
         for (const key in movingCreatures) {
-            const item = movingCreatures[key];
-            if (isCreatureEaten && item instanceof Bug && item.length == 0) {
+            const creature = movingCreatures[key];
+            if (isCreatureEaten && creature instanceof Bug && creature.length == 0) {
                 movingCreatures.splice(key, 1);
                 console.log('Bug was eaten!');
             }
             else {
-                item.draw();
+                creature.draw();
             }
         }
     }
