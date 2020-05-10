@@ -3,14 +3,13 @@ class Snake extends Creature {
     shitTrail = [];
     speed = 150;    // in milliseconds
 
-    constructor (initialTrail, initialWidth, canvas) {
+    constructor (initialTrail, initialWidth) {
         super(
             initialTrail[initialTrail.length - 1]
             , initialTrail
             , initialTrail.length
             , initialWidth
             , DIRECTION.down
-            , canvas
             , '#0f0'
         );
 
@@ -29,18 +28,18 @@ class Snake extends Creature {
         return result;
     }
 
-    draw() {
+    draw(canvas) {
         // Draw the snake
-        this.canvas.fillStyle = this.color;
+        canvas.fillStyle = this.color;
         this.body.forEach(item => {
-            this.canvas.fillRect(item.x * this.width, item.y * this.width, 
+            canvas.fillRect(item.x * this.width, item.y * this.width, 
                 this.width, this.width);
         });
 
         // Draw snake shit
-        this.canvas.fillStyle = this.shitColor;
+        canvas.fillStyle = this.shitColor;
         this.shitTrail.forEach(item => {
-            this.canvas.fillRect(item.x * this.width, item.y * this.width, 
+            canvas.fillRect(item.x * this.width, item.y * this.width, 
                 this.width, this.width);
         });
     }

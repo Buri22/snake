@@ -5,26 +5,22 @@ class Fruit {
     maxY = null;
     height = null;
     width = null;
-    canvas = null;
 
-    constructor (maxX, maxY, width, height, canvas, initialPosition) {
+    constructor (maxX, maxY, width, height, initialPosition) {
         this.maxX = maxX;
         this.maxY = maxY;
         this.width = width;
         this.height = height;
-        this.canvas = canvas;
         this.position = initialPosition;
-
-        this.draw();
     }
 
     setNewPosition(position) {
         this.position = position;
     }
 
-    draw() {
-        this.canvas.fillStyle = this.color;
-        this.canvas.fillRect(this.position.x * this.width + 1, this.position.y * this.height + 1, 
+    draw(canvas) {
+        canvas.fillStyle = this.color;
+        canvas.fillRect(this.position.x * this.width + 1, this.position.y * this.height + 1, 
             this.width - 2, this.height - 2);
     }
 

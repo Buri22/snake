@@ -1,15 +1,13 @@
 class Creature extends Moveable {
-    canvas = null;
     color = '';
     width = 0;
     numberOfEaten = {
         apples: 0
     };
 
-    constructor (headPosition, initialBody, bodyLength, initialWidth, initialDirection, canvas, color) {
+    constructor (headPosition, initialBody, bodyLength, initialWidth, initialDirection, color) {
         super(headPosition, initialBody, bodyLength, initialDirection);
 
-        this.canvas = canvas;
         this.color = color || this.getRandomColor();
         this.width = initialWidth;
     }

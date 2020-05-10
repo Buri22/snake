@@ -1,9 +1,10 @@
 class CleverBug extends Bug {
-    constructor(canvas, initialWidth) {
-        super(canvas, initialWidth);
+    constructor(initialPosition, initialWidth) {
+        super(initialPosition, initialWidth);
 
         this.moveTurnRate = 3;
         this.changeDirectionRate = 0;
+        this.drawStyle = DRAW_STYLE.circle;
     }
 
     move() {

@@ -1,57 +1,54 @@
 class Bug extends Creature {
     moveTurnRate = 3;
     changeDirectionRate = 5;
+    drawStyle = DRAW_STYLE.square;
 
-    constructor(canvas, initialWidth) {
-        let initialPosition = gamePlane.getFreePosition();
+    constructor(initialPosition, initialWidth) {
         super(
             initialPosition
             , [initialPosition]
             , Math.floor(Math.random() * 3) + 1
             , initialWidth
             , DIRECTION.down
-            , canvas
         );
     }
 
     move() {
-        if (this.length > 0) {
-            if (this.doAction(this.changeDirectionRate)) {
-                this.changeDirectionRandomly();
-            }
-            // Check if bug is going to move this turn
-            if (this.doAction(this.moveTurnRate)) {
-                let newHeadPosition = super.getNextHeadPosition();
-                let isNewHeadPositionFree = gamePlane.isPositionFree(newHeadPosition);
-                isNewHeadPositionFree = !this.isCreaturePosition(newHeadPosition);
-
-                // Make checks if bug can move in this direction
-                if (gamePlane.positionIsOutside(newHeadPosition)
-                    || isNewHeadPositionFree === false) {
-                    this.moveIndex++;
-                    return false;
-                }
-
-                // Check if fruit is eaten
-                if (fruit.isEaten(newHeadPosition)) {
-                    fruit.setNewPosition(gamePlane.getFreePosition());
-                    this.increaseLength();
-                    console.log('Bug eat fruit!', this);
-
-                    if (this.length % 4 == 0) {
-                        movingCreatures.push(new CleverBug(canvas, TILE_SIZE));
-                    }
-                }
-    
-                // Move
-                super.move(newHeadPosition);
-
-                return true;
-            }
-            else {
-                this.moveIndex++;
-            }
+        // Check if bug is going to change direction this turn
+        if (this.doAction(this.changeDirectionRate)) {
+            this.changeDirectionRandomly();
         }
+        
+        // Check if bug is going to move this turn
+        if (this.doAction(this.moveTurnRate)) {
+            let newHeadPosition = super.getNextHeadPosition();
+
+            // Make checks if bug can move in this direction
+            if (gamePlane.isPositionOutside(newHeadPosition)
+                || !gamePlane.isPositionFree(newHeadPosition)
+                || this.isCreaturePosition(newHeadPosition)) {
+                this.moveIndex++;
+                return false;
+            }
+
+            // Check if fruit is eaten
+            if (fruit.isEaten(newHeadPosition)) {
+                fruit.setNewPosition(gamePlane.getFreePosition());
+                this.increaseLength();
+                console.log('Bug eat fruit!', this);
+
+                // if (this.length % 5 == 0) {
+                //     movingCreatures.push(new CleverBug(canvas, TILE_SIZE));
+                // }
+            }
+
+            // Move
+            super.move(newHeadPosition);
+
+            return true;
+        }
+
+        this.moveIndex++;
         return false;
     }
 
@@ -65,11 +62,24 @@ class Bug extends Creature {
         });
     }
 
-    draw() {
-        this.canvas.fillStyle = this.color;
+    draw(canvas) {
+        canvas.fillStyle = this.color;
+        let r = this.width / 2;
         this.body.forEach(item => {
-            this.canvas.fillRect(item.x * this.width + 1, item.y * this.width + 1, 
-                this.width - 2, this.width - 2);
+            switch (this.drawStyle) {
+                case DRAW_STYLE.circle:
+                    canvas.beginPath();
+                    canvas.arc(item.x * this.width + r, item.y * this.width + r
+                        , r, 0, 2 * Math.PI, false);
+                    canvas.fill();
+                    break;
+
+                case DRAW_STYLE.square:
+                default:
+                    canvas.fillRect(item.x * this.width + 1, item.y * this.width + 1, 
+                        this.width - 2, this.width - 2);
+                    break;
+            }
         });
     }
 

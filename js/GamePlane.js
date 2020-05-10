@@ -9,14 +9,14 @@ class GamePlane {
     freePositions = [];
     mode = null;
 
-    constructor (canvas, gridSize, tileSize, mode) {
+    constructor (gridSize, tileSize, mode) {
         this.gridSize = gridSize;
         this.tileSize = tileSize;
         this.canvasHeight = this.canvasWidth = gridSize * tileSize;
         this.mode = mode;
 
         // Get canvas context
-        this.canvas = canvas;
+        this.canvas = document.getElementById('canvas').getContext('2d');
         this.canvas.canvas.width = this.canvasWidth;
         this.canvas.canvas.height = this.canvasHeight;
 
@@ -49,7 +49,7 @@ class GamePlane {
         });
     }
 
-    positionIsOutside(position) {
+    isPositionOutside(position) {
         if (position.x >= 0 && position.x < this.canvasWidth / this.tileSize
             && position.y >= 0 && position.y < this.canvasHeight / this.tileSize) {
             return false;
@@ -67,24 +67,20 @@ class GamePlane {
                     creaturePosition.x === freePosition.x
                     && creaturePosition.y === freePosition.y)
             );
+            
         return freePositions[Math.floor(Math.random() * freePositions.length)];
     }
 
     // Returns true if removal was successfull, otherwise returns false
     removeFreePosition(position) {
-        for (let i = this.freePositions.length - 1; i >= 0; --i) {
-            if (this.removeFreePositionByIndex(i, position)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    removeFreePositionByIndex(index, position) {
-        if (this.freePositions[index].x == position.x 
-            && this.freePositions[index].y == position.y) {
-            this.freePositions.splice(index, 1);
+        let positionIndex = this.freePositions
+            .findIndex(fp => fp.x === position.x && fp.y === position.y);
+
+        if (positionIndex !== -1) {
+            this.freePositions.splice(positionIndex, 1);
             return true;
         }
+
         return false;
     }
 

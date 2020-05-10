@@ -1,15 +1,15 @@
+'use strict';
 //import GamePlane from "GamePlane";
 
 // Constants
-const DIRECTION = Object.freeze({left: 1, up: 2, right: 3, down: 4});
-const ARROW_KEY_CODES = Object.freeze({left: 37, up: 38, right: 39, down: 40});
-const TILE_SIZE = 15;
-const GRID_SIZE = 25;
-const GAME_PLANE_MODE = Object.freeze({infinite: 1, walls: 2});
+// const DIRECTION = Object.freeze({left: 1, up: 2, right: 3, down: 4});
+// const ARROW_KEY_CODES = Object.freeze({left: 37, up: 38, right: 39, down: 40});
+// const GAME_PLANE_MODE = Object.freeze({infinite: 1, walls: 2});
+// const TILE_SIZE = 15;
+// const GRID_SIZE = 25;
 
 // Global variables
-var canvas = null,
-    gamePlane = null,
+var gamePlane = null,
     snake = null,
     fruit = null,
     bug = null,
@@ -21,15 +21,16 @@ var canvas = null,
 
 document.addEventListener("DOMContentLoaded", function() {
     // Variables
-    canvas = document.getElementById('canvas').getContext('2d');
     let snakeInitialLength = 3;
 
     // Prepare environment
-    gamePlane = new GamePlane(canvas, GRID_SIZE, TILE_SIZE, GAME_PLANE_MODE.infinite);
+    gamePlane = new GamePlane(GRID_SIZE, TILE_SIZE, GAME_PLANE_MODE.infinite);
     let snakeTrail = gamePlane.freePositions.splice(gamePlane.freePositions.length / 2 - snakeInitialLength, snakeInitialLength);
-    snake = new Snake(snakeTrail, TILE_SIZE, canvas);
-    fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, canvas, gamePlane.getFreePosition());
-    movingCreatures.push(new CleverBug(canvas, TILE_SIZE));
+    snake = new Snake(snakeTrail, TILE_SIZE);
+    fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, gamePlane.getFreePosition());
+    for (let index = 0; index < 10; index++) {
+        movingCreatures.push(new Bug(gamePlane.getFreePosition(), TILE_SIZE));
+    }
 
     // Start the game
     isGameOver = false;
@@ -37,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Listen to events
     window.addEventListener('keydown', toggleGamePause);
+
+    //var app = new App();
 });
 
 function run() {
@@ -44,7 +47,7 @@ function run() {
     let nextPosition = snake.getNextHeadPosition();
 
     // Check the walls
-    if (gamePlane.positionIsOutside(nextPosition)) {
+    if (gamePlane.isPositionOutside(nextPosition)) {
         switch (gamePlane.mode) {
             case GAME_PLANE_MODE.infinite:
                 // Infinite Game plane
@@ -61,16 +64,16 @@ function run() {
     }
 
     // Check nextPosition is free
-    let nextPositionIsFreeResult = gamePlane.isPositionFree(nextPosition);
-    if (nextPositionIsFreeResult === false) {
+    if (!gamePlane.isPositionFree(nextPosition)) {
         console.log('Next Snake head position is not free...', nextPosition);
         gameOver();
         return;
     }
     
     // Remove newHeadPosition from free positions array
-    let removeFreePositionResult = gamePlane.removeFreePosition(nextPosition);
-    if (!removeFreePositionResult) console.log('New Snake head position failed to remove from free positions...', nextPosition);
+    if (!gamePlane.removeFreePosition(nextPosition)) {
+        console.log('New Snake head position failed to remove from free positions...', nextPosition);
+    }
 
     let isFruitEaten = fruit.isEaten(nextPosition);
     if (isFruitEaten) {
@@ -82,12 +85,12 @@ function run() {
         // Check number of eaten apples to create bug
         if (snake.numberOfEaten.apples % 5 == 0) {
             let bug;            
-            if (movingCreatures.length % 1 == 0) {
+            if (movingCreatures.length % 2 == 0) {
                 // Create clever bug
-                bug = new CleverBug(canvas, TILE_SIZE);
+                bug = new CleverBug(gamePlane.getFreePosition(), TILE_SIZE);
             }
             else {
-                bug = new Bug(canvas, TILE_SIZE);
+                bug = new Bug(gamePlane.getFreePosition(), TILE_SIZE);
             }
 
             movingCreatures.push(bug);
@@ -96,11 +99,18 @@ function run() {
     }
 
     let isCreatureEaten = false;
-    for (const creature of movingCreatures) {
+    for (const key in movingCreatures) {
+        const creature = movingCreatures[key];
         // Check if creature is eaten
         if (creature.isEaten(nextPosition)) {
             snake.increaseLength();
             isCreatureEaten = true;
+
+            // Remove creature if has no body parts
+            if (creature instanceof Bug && creature.length == 0) {
+                movingCreatures.splice(key, 1);
+                console.log('Bug was eaten!');
+            }
         }
         else {
             // Otherwise -> move creature
@@ -108,6 +118,7 @@ function run() {
         }
     }
 
+    // Snake gained length => increase speed
     if (isFruitEaten || isCreatureEaten) {
         // Check the snake speed change
         if (snake.length % 10 == 0) {
@@ -123,28 +134,18 @@ function run() {
 
     // Move snake
     let snakeMoveResult = snake.move(nextPosition);
-    if (snakeMoveResult.position != null) {
-        if (snakeMoveResult.isFree) {
-            // Add new free position
-            gamePlane.freePositions.push(snakeMoveResult.position);
-        }
+    if (snakeMoveResult.position != null 
+        && snakeMoveResult.isFree) {
+        // Add new free position
+        gamePlane.freePositions.push(snakeMoveResult.position);
     }
 
     if (!isGameOver) {
         // Draw all game items
-        gamePlane.draw();
-        fruit.draw();
-        snake.draw();
-        for (const key in movingCreatures) {
-            const creature = movingCreatures[key];
-            if (isCreatureEaten && creature instanceof Bug && creature.length == 0) {
-                movingCreatures.splice(key, 1);
-                console.log('Bug was eaten!');
-            }
-            else {
-                creature.draw();
-            }
-        }
+        gamePlane.draw(gamePlane.canvas);
+        fruit.draw(gamePlane.canvas);
+        snake.draw(gamePlane.canvas);
+        movingCreatures.forEach(creature => creature.draw(gamePlane.canvas));
     }
     
     let endTime = performance.now();
@@ -171,6 +172,6 @@ function gameOver() {
     clearInterval(gameCycle);
     isGameOver = true;
     console.log('Game over');
-    averageGCD = gameCycleDurations.reduce((a, b) => a + b, 0) / gameCycleDurations.length;
+    let averageGCD = gameCycleDurations.reduce((a, b) => a + b, 0) / gameCycleDurations.length;
     console.log('Average GameCycle duration: ' + averageGCD + 'ms');
 }
