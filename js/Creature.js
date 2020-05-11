@@ -26,8 +26,8 @@ class Creature extends Moveable {
             }
         }
         while (color === gamePlane.bgColor
-            || color === snake.color
-            || color === snake.shitColor
+            // || color === snake.color
+            // || color === snake.shitColor
             || color === fruit.color)
 
         return color;
