@@ -1,4 +1,4 @@
-class Fruit {
+class Fruit extends Drawable {
     color = '#ff0707';
     position = {x: null, y: null};
     maxX = null;
@@ -7,6 +7,8 @@ class Fruit {
     width = null;
 
     constructor (maxX, maxY, width, height, initialPosition) {
+        super([initialPosition]);
+
         this.maxX = maxX;
         this.maxY = maxY;
         this.width = width;

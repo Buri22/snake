@@ -8,12 +8,14 @@ class GamePlane {
     bgColor = '#000';
     freePositions = [];
     mode = null;
+    getEatableCreaturesBodyPositions = null;
 
-    constructor (gridSize, tileSize, mode) {
+    constructor (gridSize, tileSize, mode, getEatableCreaturesBodyPositions) {
         this.gridSize = gridSize;
         this.tileSize = tileSize;
         this.canvasHeight = this.canvasWidth = gridSize * tileSize;
         this.mode = mode;
+        this.getEatableCreaturesBodyPositions = getEatableCreaturesBodyPositions;
 
         // Get canvas context
         this.canvas = document.getElementById('canvas').getContext('2d');
@@ -59,10 +61,9 @@ class GamePlane {
     
     getFreePosition() {
         // Filter-out moving creatures
+        const eatableBodyPositions = this.getEatableCreaturesBodyPositions();
         let freePositions = this.freePositions
-            .filter(freePosition => !movingCreatures
-                .map(mc => mc.body)
-                .flat()
+            .filter(freePosition => !eatableBodyPositions
                 .some(creaturePosition => 
                     creaturePosition.x === freePosition.x
                     && creaturePosition.y === freePosition.y)
