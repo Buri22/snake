@@ -1,6 +1,7 @@
 class Creature extends Moveable {
     color = '';
     width = 0;
+    moveTurnRate = 1;
     numberOfEaten = {
         apples: 0
     };
@@ -11,6 +12,10 @@ class Creature extends Moveable {
         this.color = color || this.getRandomColor();
         this.width = initialWidth;
     }
+    
+    doesMoveThisTurn() {
+        return this.moveIndex % this.moveTurnRate == 0;
+    }
 
     draw() {
         console.log(`Creature ${typeof this} has not implemented draw() function...`);
@@ -18,17 +23,11 @@ class Creature extends Moveable {
 
     getRandomColor() {
         let letters = '0123456789ABCDEF';
-        let color = '';
-        do {
-            color = '#';
-            for (let i = 0; i < 6; i++) {
-              color += letters[Math.floor(Math.random() * letters.length)];
-            }
-        }
-        while (color === gamePlane.bgColor
-            // || color === snake.color
-            // || color === snake.shitColor
-            || color === fruit.color)
+        let color = '#';
+        
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * letters.length)];
+          }
 
         return color;
     }

@@ -1,7 +1,6 @@
 class Snake extends Creature {
     shitColor = '#663300';
     shitTrail = [];
-    speed = 150;    // in milliseconds
 
     constructor (initialTrail, initialWidth) {
         super(
@@ -18,7 +17,7 @@ class Snake extends Creature {
 
     // Override parent move() to create some shit
     move(newHeadPosition) {
-        let result = super.move(newHeadPosition);
+        const result = super.move(newHeadPosition);
 
         if (result.position != null && this.doesMakeShit()) {
             this.shitTrail.push(result.position);
