@@ -22,7 +22,7 @@ class Bug extends Creature {
                 .filter(direction => !this.areOppositeDirections(this.direction + 36, direction));
     
             super.changeDirection({ 
-                keyCode: possibleKeys[Math.floor(Math.random() * 3)]
+                keyCode: possibleKeys[Math.floor(Math.random() * possibleKeys.length)]
             });
         }
     }

@@ -33,8 +33,15 @@ class App {
         //}
         
         this.fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, this.gamePlane.getFreePosition());
+        
+        // const subscription = EventBus.subscribe(
+        //     "print",
+        //     message => console.log(`printing: ${message}`)
+        //   )
+    };
 
-        // Start the game
+    // Start the game
+    startGame() {
         this.isGameOver = false;
         this.gameSpeed = 150;    // in miliseconds
         this.gameInterval = setInterval(this.gameCycle.bind(this), this.gameSpeed);
@@ -42,12 +49,7 @@ class App {
 
         // Listen to events
         window.addEventListener('keydown', this.toggleGamePause.bind(this));
-        
-        // const subscription = EventBus.subscribe(
-        //     "print",
-        //     message => console.log(`printing: ${message}`)
-        //   )
-    };
+    }
 
     gameCycle() {
         let startTime = performance.now();
@@ -74,7 +76,7 @@ class App {
                     case GAME_PLANE_MODE.walls:
                     default:
                         // Game plane with walls
-                        console.log('Next Snake head position is out of the Game Plane...', nextPosition);
+                        console.log(`Next Snake ${snake.name} head position is out of the Game Plane: ${nextPosition}`);
                         this.gameOver();
                         return;
                 }
@@ -82,14 +84,14 @@ class App {
 
             // Check nextPosition is free
             if (!this.gamePlane.isPositionFree(nextPosition)) {
-                console.log('Next Snake head position is not free...', nextPosition);
+                console.log(`Next Snake ${snake.name} head position is not free: ${nextPosition}`);
                 this.gameOver();
                 return;
             }
             
             // Remove newHeadPosition from free positions array
             if (!this.gamePlane.removeFreePosition(nextPosition)) {
-                console.log('New Snake head position failed to remove from free positions...', nextPosition);
+                console.log(`New Snake ${snake.name} head position failed to remove from free positions: ${nextPosition}`);
             }
 
             const isFruitEaten = this.fruit.isEaten(nextPosition);
@@ -97,7 +99,7 @@ class App {
                 this.fruit.setNewPosition(this.gamePlane.getFreePosition());
                 snake.increaseLength();
                 snake.numberOfEaten.apples++;
-                console.log(`Number of eaten apples: ${snake.numberOfEaten.apples}`);
+                console.log(`Snake ${snake.name} already eaten ${snake.numberOfEaten.apples} apples`);
                 
                 // Check number of eaten apples to create bug
                 if (snake.numberOfEaten.apples % 5 == 0) {
@@ -108,18 +110,19 @@ class App {
                     }
                     else {
                         bug = new CleverBug(initialBugPosition, TILE_SIZE
-                                , this.isPositionFree.bind(this), this.isCreaturePosition.bind(this)
-                                , this.getFruitPosition.bind(this));
+                            , this.isPositionFree.bind(this), this.isCreaturePosition.bind(this)
+                            , this.getFruitPosition.bind(this));
                     }
 
                     this.bugs.push(bug);
-                    console.log('New Bug is in the game!');
+                    console.log(`New Bug ${bug.name} is in the game!`);
                 }
             }
 
             let isCreatureEaten = false;
             for (const key in this.bugs) {
                 const bug = this.bugs[key];
+
                 // Check if creature is eaten
                 if (bug.isEaten(nextPosition)) {
                     snake.increaseLength(2);
@@ -129,7 +132,8 @@ class App {
                     if (bug instanceof Bug && bug.length == 0) {
                         this.bugs.splice(key, 1);
                         snake.numberOfEaten.bugs++;
-                        console.log(`Bug was eaten!Number of eaten bugs: ${snake.numberOfEaten.bugs}`);
+                        console.log(`Snake ${snake.name} ate Bug ${bug.name}! 
+                            ${snake.name} already eaten ${snake.numberOfEaten.bugs} bugs`);
                     }
                 }
             }
@@ -185,7 +189,7 @@ class App {
                 this.fruit.setNewPosition(this.gamePlane.getFreePosition());
                 bug.increaseLength();
                 bug.numberOfEaten.apples++;
-                console.log('Bug eat fruit!', bug);
+                console.log(`Bug ${bug.name} just eat fruit!`, bug);
             }
 
             // Move Bug
@@ -225,9 +229,28 @@ class App {
         // TODO refactor for handling multiple players
         clearInterval(this.gameInterval);
         this.isGameOver = true;
+
+        // Statistics
         console.log('Game over');
         const averageGCD = this.gameCycleDurations.reduce((a, b) => a + b, 0) / this.gameCycleDurations.length;
         console.log(`Average GameCycle duration: ${averageGCD}ms`);
+
+        this.snakes
+            .sort((a, b) => b.numberOfEaten.apples - a.numberOfEaten.apples)
+            .forEach(snake => {
+                console.log(`Snake ${snake.name}
+    Length: ${snake.length}
+    Eaten Apples: ${snake.numberOfEaten.apples}
+    Eaten Bugs: ${snake.numberOfEaten.bugs}`);
+            });
+
+        this.bugs
+            .sort((a, b) => b.numberOfEaten.apples - a.numberOfEaten.apples)
+            .forEach(bug => {
+                console.log(`Bug ${bug.name}
+    Length: ${bug.length}
+    Eaten Apples: ${bug.numberOfEaten.apples}`);
+            });
     }
 
     generateSnakeTrail() {
