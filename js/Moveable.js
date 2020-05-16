@@ -1,20 +1,20 @@
-class Moveable {
+class Moveable extends Drawable {
     moveIndex = 0;
     direction = null;
     directionsStack = [];
-    body = null;
     length = 0;
     headPosition = {x: null, y: null};
 
     constructor(headPosition, initialBody, bodyLength, initialDirection) {
+        super(initialBody);
+
         this.headPosition = headPosition;
-        this.body = initialBody;
         this.length = bodyLength;
         this.direction = initialDirection;
     }
     
     // Input => new head position
-    // Returns => new free position or shit position (not free ;)
+    // Returns => new free position
     move(newHeadPosition) {
         let result = {
             position: null,
@@ -98,7 +98,7 @@ class Moveable {
 
     increaseLength(x = 1) {
         this.length += x;
-        console.log(this.length);
+        //console.log(this.length);
     }
     decreaseLength(x = 1) {
         this.length -= x;

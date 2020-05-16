@@ -1,18 +1,25 @@
 class CleverBug extends Bug {
-    constructor(initialPosition, initialWidth) {
+    isPositionFree = null;
+    isCreaturePosition = null;
+    getFruitPosition = null;
+
+    constructor(initialPosition, initialWidth, isPositionFree, isCreaturePosition, getFruitPosition) {
         super(initialPosition, initialWidth);
 
         this.moveTurnRate = 3;
         this.changeDirectionRate = 0;
         this.drawStyle = DRAW_STYLE.circle;
+        this.isPositionFree = isPositionFree;
+        this.isCreaturePosition = isCreaturePosition;
+        this.getFruitPosition = getFruitPosition;
     }
 
-    move() {
+    changeDirection() {
         let possibleDirections = this.getPossibleDirections();
         if (possibleDirections.length === 1) {
             // Creature has just one possible free direction => take it
             this.direction = possibleDirections[0];
-            return super.move();
+            return;
         }
         else if (possibleDirections.length > 1) {
             let directionsMovingCloser = this.getDirectionsMovingCloser();
@@ -25,7 +32,7 @@ class CleverBug extends Bug {
                 else {
                     this.direction = possibleDirectionGettingCloser[Math.floor(Math.random() * 2)];
                 }
-                return super.move();
+                return;
             }
 
             if (possibleDirections.length > 0) {
@@ -35,33 +42,33 @@ class CleverBug extends Bug {
                 else {
                     this.direction = possibleDirections[Math.floor(Math.random() * 2)];
                 }
-                return super.move();
+                return;
             }
         }
-        return;
     }
 
     getPossibleDirections() {
         return Object.values(DIRECTION).filter(direction => {
             let newHeadPosition = this.getNextHeadPosition(direction);
-            return gamePlane.isPositionFree(newHeadPosition) 
+            return this.isPositionFree(newHeadPosition) 
                 && !this.isCreaturePosition(newHeadPosition);
         });
     }
 
     // Find directions moving closer to the fruit
     getDirectionsMovingCloser() {
+        const frutiPosition = this.getFruitPosition();
         let directionsMovingCloser = [];
-        if (fruit.position.x != this.headPosition.x) {
-            if (fruit.position.x > this.headPosition.x) {
+        if (frutiPosition.x != this.headPosition.x) {
+            if (frutiPosition.x > this.headPosition.x) {
                 directionsMovingCloser.push(DIRECTION.right);
             }
             else {
                 directionsMovingCloser.push(DIRECTION.left);
             }
         }
-        if (fruit.position.y != this.headPosition.y) {
-            if (fruit.position.y > this.headPosition.y) {
+        if (frutiPosition.y != this.headPosition.y) {
+            if (frutiPosition.y > this.headPosition.y) {
                 directionsMovingCloser.push(DIRECTION.down);
             }
             else {
@@ -69,5 +76,16 @@ class CleverBug extends Bug {
             }
         }
         return directionsMovingCloser;
+    }
+
+    draw(canvas) {
+        canvas.fillStyle = this.color;
+        let r = this.width / 2;
+        this.body.forEach(item => {
+            canvas.beginPath();
+            canvas.arc(item.x * this.width + r, item.y * this.width + r
+                , r, 0, 2 * Math.PI, false);
+            canvas.fill();
+        });
     }
 }
