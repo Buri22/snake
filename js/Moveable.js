@@ -1,14 +1,16 @@
-class Moveable {
+class Moveable extends Drawable {
     moveIndex = 0;
     direction = null;
     directionsStack = [];
-    body = null;
+    //body = null;
     length = 0;
     headPosition = {x: null, y: null};
 
     constructor(headPosition, initialBody, bodyLength, initialDirection) {
+        super(initialBody);
+
         this.headPosition = headPosition;
-        this.body = initialBody;
+        //this.body = initialBody;
         this.length = bodyLength;
         this.direction = initialDirection;
     }

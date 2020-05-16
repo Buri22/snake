@@ -25,29 +25,13 @@ class Bug extends Creature {
                 keyCode: possibleKeys[Math.floor(Math.random() * 3)]
             });
         }
-        
-        //return super.move(nextHeadPosition);
-        
     }
 
     draw(canvas) {
         canvas.fillStyle = this.color;
-        let r = this.width / 2;
-        this.body.forEach(item => {
-            switch (this.drawStyle) {
-                case DRAW_STYLE.circle:
-                    canvas.beginPath();
-                    canvas.arc(item.x * this.width + r, item.y * this.width + r
-                        , r, 0, 2 * Math.PI, false);
-                    canvas.fill();
-                    break;
-
-                case DRAW_STYLE.square:
-                default:
-                    canvas.fillRect(item.x * this.width + 1, item.y * this.width + 1, 
-                        this.width - 2, this.width - 2);
-                    break;
-            }
+        this.body.forEach(position => {
+            canvas.fillRect(position.x * this.width + 1, position.y * this.width + 1, 
+                this.width - 2, this.width - 2);
         });
     }
 

@@ -19,7 +19,7 @@ class CleverBug extends Bug {
         if (possibleDirections.length === 1) {
             // Creature has just one possible free direction => take it
             this.direction = possibleDirections[0];
-            //return super.move(nextHeadPosition);
+            return;
         }
         else if (possibleDirections.length > 1) {
             let directionsMovingCloser = this.getDirectionsMovingCloser();
@@ -32,7 +32,6 @@ class CleverBug extends Bug {
                 else {
                     this.direction = possibleDirectionGettingCloser[Math.floor(Math.random() * 2)];
                 }
-                //return super.move(nextHeadPosition);
                 return;
             }
 
@@ -43,11 +42,9 @@ class CleverBug extends Bug {
                 else {
                     this.direction = possibleDirections[Math.floor(Math.random() * 2)];
                 }
-                //return super.move(nextHeadPosition);
                 return;
             }
         }
-        //return;
     }
 
     getPossibleDirections() {
@@ -79,5 +76,16 @@ class CleverBug extends Bug {
             }
         }
         return directionsMovingCloser;
+    }
+
+    draw(canvas) {
+        canvas.fillStyle = this.color;
+        let r = this.width / 2;
+        this.body.forEach(item => {
+            canvas.beginPath();
+            canvas.arc(item.x * this.width + r, item.y * this.width + r
+                , r, 0, 2 * Math.PI, false);
+            canvas.fill();
+        });
     }
 }

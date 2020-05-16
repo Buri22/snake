@@ -1,7 +1,5 @@
 //import EventBus from './EventBus';
 
-// TODO: make Drawable class that will have methods: draw() and getRandomColor()
-
 class App {
     // App properties
     gamePlane = null;
@@ -25,11 +23,14 @@ class App {
             new Snake(this.generateSnakeTrail(), TILE_SIZE)
         );
 
-        this.bugs.push(
-            new CleverBug(this.gamePlane.getFreePosition(), TILE_SIZE
-                , this.isPositionFree.bind(this), this.isCreaturePosition.bind(this)
-                , this.getFruitPosition.bind(this))
-        );
+        //for (let i = 0; i < 20; i++) {
+            this.bugs.push(
+                new CleverBug(this.gamePlane.getFreePosition(), TILE_SIZE
+                    , this.isPositionFree.bind(this), this.isCreaturePosition.bind(this)
+                    , this.getFruitPosition.bind(this)),
+                new Bug(this.gamePlane.getFreePosition(), TILE_SIZE)
+            );    
+        //}
         
         this.fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, this.gamePlane.getFreePosition());
 
@@ -127,7 +128,8 @@ class App {
                     // Remove creature if it has no body parts
                     if (bug instanceof Bug && bug.length == 0) {
                         this.bugs.splice(key, 1);
-                        console.log('Bug was eaten!');
+                        snake.numberOfEaten.bugs++;
+                        console.log(`Bug was eaten!Number of eaten bugs: ${snake.numberOfEaten.bugs}`);
                     }
                 }
             }
@@ -164,17 +166,17 @@ class App {
                 continue;
             }
 
-            // Get bug next head position
-            let nextPosition = bug.getNextHeadPosition();
-
             // Change direction
             bug.changeDirection();
+
+            // Get bug next head position
+            let nextPosition = bug.getNextHeadPosition();
 
             // Check bug can move in its direction
             if (this.gamePlane.isPositionOutside(nextPosition)
                 || !this.gamePlane.isPositionFree(nextPosition)
                 || this.isCreaturePosition(nextPosition)) {
-                this.moveIndex++;
+                bug.moveIndex++;
                 continue;
             }
             
@@ -182,6 +184,7 @@ class App {
             if (this.fruit.isEaten(nextPosition)) {
                 this.fruit.setNewPosition(this.gamePlane.getFreePosition());
                 bug.increaseLength();
+                bug.numberOfEaten.apples++;
                 console.log('Bug eat fruit!', bug);
             }
 
