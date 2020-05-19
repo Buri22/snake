@@ -1,7 +1,6 @@
 class Moveable extends Drawable {
     moveIndex = 0;
     direction = null;
-    directionsStack = [];
     length = 0;
     headPosition = {x: null, y: null};
 
@@ -34,37 +33,8 @@ class Moveable extends Drawable {
         return result;
     }
     
-    changeDirection(event) {
-        let newDirection = null;
-        switch (event.keyCode) {
-            case ARROW_KEY_CODES.left:
-                newDirection = DIRECTION.left;
-                break;
-            case ARROW_KEY_CODES.up:
-                newDirection = DIRECTION.up;
-                break;
-            case ARROW_KEY_CODES.right:
-                newDirection = DIRECTION.right;
-                break;
-            case ARROW_KEY_CODES.down:
-                newDirection = DIRECTION.down;
-                break;
-        }
-
-        // Check current move directionsStack
-        if (newDirection != null) {
-            if (this.directionsStack[this.moveIndex] == undefined
-                && this.direction != newDirection
-                && !this.areOppositeDirections(this.direction, newDirection)) {
-                this.directionsStack.length = 0;
-                this.directionsStack[this.moveIndex] = newDirection;
-                this.direction = newDirection;
-            }
-            else if (!this.areOppositeDirections(this.directionsStack[this.directionsStack.length - 1], newDirection))
-            {
-                this.directionsStack.push(newDirection);
-            }
-        }
+    changeDirection() {
+        console.log('This moveable has not implemented its changeDirection function.');
     }
 
     getNextHeadPosition(direction = null) {
@@ -72,10 +42,6 @@ class Moveable extends Drawable {
             x: this.headPosition.x,
             y: this.headPosition.y
         };
-
-        if (this.directionsStack[this.moveIndex] != undefined) {
-            this.direction = this.directionsStack[this.moveIndex];
-        }
 
         switch (direction || this.direction) {
             case DIRECTION.up:

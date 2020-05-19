@@ -58,11 +58,17 @@ class GamePlane {
         }
         return true;
     }
+
+    isPositionFree(position) {
+        return this.freePositions.some(freePosition => 
+            freePosition.x === position.x 
+            && freePosition.y === position.y);
+    }
     
     getFreePosition() {
         // Filter-out moving creatures
         const eatableBodyPositions = this.getEatableCreaturesBodyPositions();
-        let freePositions = this.freePositions
+        const freePositions = this.freePositions
             .filter(freePosition => !eatableBodyPositions
                 .some(creaturePosition => 
                     creaturePosition.x === freePosition.x
@@ -74,21 +80,23 @@ class GamePlane {
 
     // Returns true if removal was successfull, otherwise returns false
     removeFreePosition(position) {
-        let positionIndex = this.freePositions
-            .findIndex(fp => fp.x === position.x && fp.y === position.y);
+        const positionIndex = this.getFreePositionIndex(position);
 
         if (positionIndex !== -1) {
-            this.freePositions.splice(positionIndex, 1);
+            this.removeFreePositionByIndex(positionIndex);
             return true;
         }
 
         return false;
     }
 
-    isPositionFree(position) {
-        return this.freePositions.some(freePosition => 
-            freePosition.x === position.x 
-            && freePosition.y === position.y);
+    removeFreePositionByIndex(index) {
+        this.freePositions.splice(index, 1);
+    }
+
+    getFreePositionIndex(position) {
+        return this.freePositions
+            .findIndex(fp => fp.x === position.x && fp.y === position.y);
     }
 
     getInfiniteNextPosition(position) {

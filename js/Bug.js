@@ -18,12 +18,10 @@ class Bug extends Creature {
         // Check if bug is going to change direction this turn
         if (this.moveIndex % this.changeDirectionRate == 0) {
             // Filter out opposite direction arrow key code
-            let possibleKeys = Object.values(ARROW_KEY_CODES)
-                .filter(direction => !this.areOppositeDirections(this.direction + 36, direction));
+            const possibleDirections = Object.values(DIRECTION)
+                .filter(direction => !this.areOppositeDirections(this.direction, direction));
     
-            super.changeDirection({ 
-                keyCode: possibleKeys[Math.floor(Math.random() * possibleKeys.length)]
-            });
+            this.direction = Math.floor(Math.random() * possibleDirections.length);
         }
     }
 
@@ -36,9 +34,9 @@ class Bug extends Creature {
     }
 
     isEaten(position) {
-        for (const i in this.body) {
-            if (this.body[i].x == position.x && this.body[i].y == position.y) {
-                this.body.splice(i, 1);
+        for (const index in this.body) {
+            if (this.body[index].x == position.x && this.body[index].y == position.y) {
+                this.body.splice(index, 1);
                 this.length--;
                 return true;
             }

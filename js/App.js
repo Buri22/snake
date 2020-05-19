@@ -19,18 +19,20 @@ class App {
         this.gamePlane = new GamePlane(GRID_SIZE, TILE_SIZE, GAME_PLANE_MODE.infinite
             , this.getEatableCreaturesBodyPositions.bind(this));
 
-        this.snakes.push(
-            new Snake(this.generateSnakeTrail(), TILE_SIZE)
-        );
+        for (let i = 0; i < 3; i++) {
+            this.snakes.push(
+                new Snake(this.getInitialSnakeHead(i), TILE_SIZE, 3, i + 1, CONTROL_KEY_SETS[i])
+            );
+        }
 
-        //for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 1; i++) {
             this.bugs.push(
                 new CleverBug(this.gamePlane.getFreePosition(), TILE_SIZE
                     , this.isPositionFree.bind(this), this.isCreaturePosition.bind(this)
-                    , this.getFruitPosition.bind(this)),
-                new Bug(this.gamePlane.getFreePosition(), TILE_SIZE)
+                    , this.getFruitPosition.bind(this))
+               //, new Bug(this.gamePlane.getFreePosition(), TILE_SIZE)
             );    
-        //}
+        }
         
         this.fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, this.gamePlane.getFreePosition());
         
@@ -52,7 +54,7 @@ class App {
     }
 
     gameCycle() {
-        let startTime = performance.now();
+        const startTime = performance.now();
 
         // Loop through snakes =================================================================
         for (const snake of this.snakes) {
@@ -76,22 +78,22 @@ class App {
                     case GAME_PLANE_MODE.walls:
                     default:
                         // Game plane with walls
-                        console.log(`Next Snake ${snake.name} head position is out of the Game Plane: ${nextPosition}`);
+                        console.log(`Next Snake ${snake.name} head position is out of the Game Plane: `, nextPosition);
                         this.gameOver();
                         return;
                 }
             }
 
             // Check nextPosition is free
-            if (!this.gamePlane.isPositionFree(nextPosition)) {
-                console.log(`Next Snake ${snake.name} head position is not free: ${nextPosition}`);
+            const nextFreePositionIndex = this.gamePlane.getFreePositionIndex(nextPosition);
+            if (nextFreePositionIndex === -1) {
+                console.log(`Next Snake ${snake.name} head position is not free:`, nextPosition);
                 this.gameOver();
                 return;
             }
-            
-            // Remove newHeadPosition from free positions array
-            if (!this.gamePlane.removeFreePosition(nextPosition)) {
-                console.log(`New Snake ${snake.name} head position failed to remove from free positions: ${nextPosition}`);
+            else {
+                // Remove newHeadPosition from free positions array
+                this.gamePlane.removeFreePositionByIndex(nextFreePositionIndex);
             }
 
             const isFruitEaten = this.fruit.isEaten(nextPosition);
@@ -205,8 +207,7 @@ class App {
             this.bugs.forEach(bug => bug.draw(this.gamePlane.canvas));
         }
         
-        let endTime = performance.now();
-        this.gameCycleDurations.push(endTime - startTime);
+        this.gameCycleDurations.push(performance.now() - startTime);
         //console.log(`GameCycle took ${endTime - startTime}ms`);
     }
 
@@ -229,11 +230,13 @@ class App {
         // TODO refactor for handling multiple players
         clearInterval(this.gameInterval);
         this.isGameOver = true;
+        console.log('Game over');
 
         // Statistics
-        console.log('Game over');
-        const averageGCD = this.gameCycleDurations.reduce((a, b) => a + b, 0) / this.gameCycleDurations.length;
-        console.log(`Average GameCycle duration: ${averageGCD}ms`);
+        if (this.gameCycleDurations.length > 0) {
+            const averageGCD = this.gameCycleDurations.reduce((a, b) => a + b) / this.gameCycleDurations.length;
+            console.log(`Average GameCycle duration: ${averageGCD}ms`);
+        }
 
         this.snakes
             .sort((a, b) => b.numberOfEaten.apples - a.numberOfEaten.apples)
@@ -253,11 +256,16 @@ class App {
             });
     }
 
-    generateSnakeTrail() {
-        // Refactor this logic to work for multiple generated snakes
-        const snakeInitialLength = 3;
-        return this.gamePlane.freePositions.splice(
-            this.gamePlane.freePositions.length / 2 - snakeInitialLength, snakeInitialLength);
+    getInitialSnakeHead(snakeIndex) {
+        const headPosition = this.gamePlane.freePositions[Math.floor(this.gamePlane.freePositions.length / 2)];
+        const result = {
+            x: headPosition.x + snakeIndex,
+            y: headPosition.y + snakeIndex
+        };
+
+        this.gamePlane.removeFreePosition(result);
+
+        return result;
     }
 
     isPositionFree(position) {

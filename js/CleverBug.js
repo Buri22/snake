@@ -6,9 +6,10 @@ class CleverBug extends Bug {
     constructor(initialPosition, initialWidth, isPositionFree, isCreaturePosition, getFruitPosition) {
         super(initialPosition, initialWidth);
 
-        this.moveTurnRate = 3;
+        this.moveTurnRate = 1;
         this.changeDirectionRate = 0;
         this.drawStyle = DRAW_STYLE.circle;
+
         this.isPositionFree = isPositionFree;
         this.isCreaturePosition = isCreaturePosition;
         this.getFruitPosition = getFruitPosition;
