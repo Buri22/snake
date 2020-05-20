@@ -17,11 +17,12 @@ class Moveable extends Drawable {
     move(newHeadPosition) {
         let result = {
             position: null,
-            isFree: true
+            isFree: false
         };
 
         while (this.body.length >= this.length) {
             result.position = this.body.shift();
+            result.isFree = true;
         }
 
         this.body.push(newHeadPosition);

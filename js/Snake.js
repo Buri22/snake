@@ -92,6 +92,7 @@ class Snake extends Creature {
     }
 
     doesMakeShit() {
+        return false;
         return this.shitTrail.length < Math.floor(this.body.length / 5) 
             && Math.floor(Math.random() * 100) < 25;
     }

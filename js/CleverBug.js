@@ -1,16 +1,16 @@
 class CleverBug extends Bug {
-    isPositionFree = null;
+    isMoveablePosition = null;
     isCreaturePosition = null;
     getFruitPosition = null;
 
-    constructor(initialPosition, initialWidth, isPositionFree, isCreaturePosition, getFruitPosition) {
+    constructor(initialPosition, initialWidth, isMoveablePosition, isCreaturePosition, getFruitPosition) {
         super(initialPosition, initialWidth);
 
-        this.moveTurnRate = 1;
+        this.moveTurnRate = 2;
         this.changeDirectionRate = 0;
         this.drawStyle = DRAW_STYLE.circle;
 
-        this.isPositionFree = isPositionFree;
+        this.isMoveablePosition = isMoveablePosition;
         this.isCreaturePosition = isCreaturePosition;
         this.getFruitPosition = getFruitPosition;
     }
@@ -51,8 +51,8 @@ class CleverBug extends Bug {
     getPossibleDirections() {
         return Object.values(DIRECTION).filter(direction => {
             let newHeadPosition = this.getNextHeadPosition(direction);
-            return this.isPositionFree(newHeadPosition) 
-                && !this.isCreaturePosition(newHeadPosition);
+            return this.isMoveablePosition(newHeadPosition);
+                //&& !this.isCreaturePosition(newHeadPosition);
         });
     }
 

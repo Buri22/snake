@@ -8,14 +8,12 @@ class GamePlane {
     bgColor = '#000';
     freePositions = [];
     mode = null;
-    getEatableCreaturesBodyPositions = null;
 
-    constructor (gridSize, tileSize, mode, getEatableCreaturesBodyPositions) {
+    constructor (gridSize, tileSize, mode) {
         this.gridSize = gridSize;
         this.tileSize = tileSize;
         this.canvasHeight = this.canvasWidth = gridSize * tileSize;
         this.mode = mode;
-        this.getEatableCreaturesBodyPositions = getEatableCreaturesBodyPositions;
 
         // Get canvas context
         this.canvas = document.getElementById('canvas').getContext('2d');
@@ -23,16 +21,12 @@ class GamePlane {
         this.canvas.canvas.height = this.canvasHeight;
 
         // Set freePositions array
-        for (let index = 0; index < gridSize * gridSize; index++) {
-            if (index == 0) {
-                this.freePositions.push({x: 0, y: 0});
-            }
-            else {
-                this.freePositions.push({
-                    x: Math.floor(index / gridSize), 
-                    y: index % gridSize
-                });
-            }
+        this.freePositions.push({x: 0, y: 0});
+        for (let index = 1; index < gridSize * gridSize; index++) {
+            this.freePositions.push({
+                x: Math.floor(index / gridSize), 
+                y: index % gridSize
+            });
         }
 
         // Draw the default layout
@@ -42,13 +36,13 @@ class GamePlane {
     draw() {
         // draw background
         this.canvas.fillStyle = this.bgColor;
-        // this.canvas.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
-        
+        this.canvas.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
         // draw all free positions
-        this.freePositions.forEach(item => {
-            this.canvas.fillRect(item.x * this.tileSize, item.y * this.tileSize, 
-                this.tileSize, this.tileSize);
-        });
+        // this.freePositions.forEach(item => {
+        //     this.canvas.fillRect(item.x * this.tileSize, item.y * this.tileSize, 
+        //         this.tileSize, this.tileSize);
+        // });
     }
 
     isPositionOutside(position) {
@@ -59,27 +53,14 @@ class GamePlane {
         return true;
     }
 
-    isPositionFree(position) {
+    isMoveablePosition(position) {
         return this.freePositions.some(freePosition => 
             freePosition.x === position.x 
             && freePosition.y === position.y);
     }
-    
-    getFreePosition() {
-        // Filter-out moving creatures
-        const eatableBodyPositions = this.getEatableCreaturesBodyPositions();
-        const freePositions = this.freePositions
-            .filter(freePosition => !eatableBodyPositions
-                .some(creaturePosition => 
-                    creaturePosition.x === freePosition.x
-                    && creaturePosition.y === freePosition.y)
-            );
-            
-        return freePositions[Math.floor(Math.random() * freePositions.length)];
-    }
 
-    // Returns true if removal was successfull, otherwise returns false
-    removeFreePosition(position) {
+    // Returns true if the given position was found and removal was successfull, otherwise returns false
+    tryToRemove(position) {
         const positionIndex = this.getFreePositionIndex(position);
 
         if (positionIndex !== -1) {
@@ -92,6 +73,14 @@ class GamePlane {
 
     removeFreePositionByIndex(index) {
         this.freePositions.splice(index, 1);
+    }
+
+    tryToAddPosition(moveResult) {
+        if (moveResult.position != null 
+            && moveResult.isFree) {
+            // Add new free position
+            this.freePositions.push(moveResult.position);
+        }
     }
 
     getFreePositionIndex(position) {

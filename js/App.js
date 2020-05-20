@@ -16,25 +16,25 @@ class App {
 
     constructor() {
         // Set Environment
-        this.gamePlane = new GamePlane(GRID_SIZE, TILE_SIZE, GAME_PLANE_MODE.infinite
-            , this.getEatableCreaturesBodyPositions.bind(this));
+        this.gamePlane = new GamePlane(25, 15, GAME_PLANE_MODE.infinite);
+        
+        this.fruit = new Fruit(this.gamePlane.gridSize, this.gamePlane.gridSize
+            , this.gamePlane.tileSize, this.gamePlane.tileSize, this.getFreePosition());
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 1; i++) {
             this.snakes.push(
-                new Snake(this.getInitialSnakeHead(i), TILE_SIZE, 3, i + 1, CONTROL_KEY_SETS[i])
+                new Snake(this.getInitialSnakeHead(i), this.gamePlane.tileSize, 10, i + 1, CONTROL_KEY_SETS[i])
             );
         }
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 5; i++) {
             this.bugs.push(
-                new CleverBug(this.gamePlane.getFreePosition(), TILE_SIZE
-                    , this.isPositionFree.bind(this), this.isCreaturePosition.bind(this)
-                    , this.getFruitPosition.bind(this))
-               //, new Bug(this.gamePlane.getFreePosition(), TILE_SIZE)
+                new CleverBug(this.getFreePositionAndRemove(), this.gamePlane.tileSize
+                    , this.isMoveablePosition.bind(this), this.isCreaturePosition.bind(this)
+                    , this.fruit.getBodyPositions.bind(this.fruit))
+               //, new Bug(this.getFreePositionAndRemove(), this.gamePlane.tileSize)
             );    
         }
-        
-        this.fruit = new Fruit(GRID_SIZE, GRID_SIZE, TILE_SIZE, TILE_SIZE, this.gamePlane.getFreePosition());
         
         // const subscription = EventBus.subscribe(
         //     "print",
@@ -66,7 +66,7 @@ class App {
 
             // Get snake next head position
             let nextPosition = snake.getNextHeadPosition();
-
+            
             // Check the walls
             if (this.gamePlane.isPositionOutside(nextPosition)) {
                 switch (this.gamePlane.mode) {
@@ -84,84 +84,68 @@ class App {
                 }
             }
 
-            // Check nextPosition is free
-            const nextFreePositionIndex = this.gamePlane.getFreePositionIndex(nextPosition);
-            if (nextFreePositionIndex === -1) {
-                console.log(`Next Snake ${snake.name} head position is not free:`, nextPosition);
-                this.gameOver();
-                return;
-            }
-            else {
-                // Remove newHeadPosition from free positions array
-                this.gamePlane.removeFreePositionByIndex(nextFreePositionIndex);
-            }
+            //Check Fruit isEaten
+            if (this.fruit.isEaten(nextPosition)) {
+                // Set new Fruit position
+                this.fruit.setNewPosition(this.getFreePosition());
 
-            const isFruitEaten = this.fruit.isEaten(nextPosition);
-            if (isFruitEaten) {
-                this.fruit.setNewPosition(this.gamePlane.getFreePosition());
+                // Inrease Snake length + check game speed change
                 snake.increaseLength();
-                snake.numberOfEaten.apples++;
-                console.log(`Snake ${snake.name} already eaten ${snake.numberOfEaten.apples} apples`);
+                this.handleGameSpeedChange(snake.body.length);
                 
                 // Check number of eaten apples to create bug
-                if (snake.numberOfEaten.apples % 5 == 0) {
-                    let bug;
-                    const initialBugPosition = this.gamePlane.getFreePosition();
-                    if (this.bugs.length % 3 == 0) {
-                        bug = new Bug(initialBugPosition, TILE_SIZE);
+                snake.numberOfEaten.apples++;
+                this.handleBugCreation(snake.numberOfEaten.apples);
+                console.log(`Snake ${snake.name} already eaten ${snake.numberOfEaten.apples} apples`);
+
+                // Remove last fruit position / new snake head position from gamePlane
+                this.gamePlane.tryToRemove(nextPosition);
+                snake.move(nextPosition);
+            }
+            else {
+                // Check creature isEaten
+                let isCreatureEaten = false;
+                for (const key in this.bugs) {
+                    const bug = this.bugs[key];
+    
+                    // Check if creature is eaten
+                    if (bug.isEaten(nextPosition)) {
+                        snake.increaseLength(2);
+                        snake.move(nextPosition);
+                        this.handleGameSpeedChange(snake.length - 1);
+                        isCreatureEaten = true;
+    
+                        // Remove creature if it has no body parts
+                        if (bug.length == 0) {
+                            this.bugs.splice(key, 1);
+                            snake.numberOfEaten.bugs++;
+                            console.log(`Snake ${snake.name} ate Bug ${bug.name}! 
+    ${snake.name} already eaten ${snake.numberOfEaten.bugs} bugs`);
+                        }
+
+                        break;
+                    }
+                }
+
+                if (!isCreatureEaten) {
+                    // Try to remove nextPosition from GamePlane
+                    if (this.gamePlane.tryToRemove(nextPosition)) {
+                        // Move snake
+                        this.gamePlane.tryToAddPosition(snake.move(nextPosition));
                     }
                     else {
-                        bug = new CleverBug(initialBugPosition, TILE_SIZE
-                            , this.isPositionFree.bind(this), this.isCreaturePosition.bind(this)
-                            , this.getFruitPosition.bind(this));
-                    }
-
-                    this.bugs.push(bug);
-                    console.log(`New Bug ${bug.name} is in the game!`);
-                }
-            }
-
-            let isCreatureEaten = false;
-            for (const key in this.bugs) {
-                const bug = this.bugs[key];
-
-                // Check if creature is eaten
-                if (bug.isEaten(nextPosition)) {
-                    snake.increaseLength(2);
-                    isCreatureEaten = true;
-
-                    // Remove creature if it has no body parts
-                    if (bug instanceof Bug && bug.length == 0) {
-                        this.bugs.splice(key, 1);
-                        snake.numberOfEaten.bugs++;
-                        console.log(`Snake ${snake.name} ate Bug ${bug.name}! 
-                            ${snake.name} already eaten ${snake.numberOfEaten.bugs} bugs`);
+                        console.log(`Next Snake ${snake.name} head position is not free:`, nextPosition);
+                        this.gameOver();
+                        return;
                     }
                 }
             }
 
-            // Snake gained length => increase gameSpeed
-            if (isFruitEaten || isCreatureEaten) {
-                // Check the gameSpeed change
-                if (snake.length % 10 == 0) {
-                    // Change setInterval time
-                    this.gameSpeed -= 10;
-                    if (this.gameSpeed < 30) { this.gameSpeed = 30; }
-                    
-                    // Reset game interval
-                    clearInterval(this.gameInterval);
-                    this.gameInterval = setInterval(this.gameCycle.bind(this), this.gameSpeed);
-                }
-            }
-
-            // Move snake
-            let snakeMoveResult = snake.move(nextPosition);
-            if (snakeMoveResult.position != null) {
-                if (snakeMoveResult.isFree) {
-                    // Add new free position
-                    this.gamePlane.freePositions.push(snakeMoveResult.position);
-                }
-            }
+            // snake.body.forEach(position => {
+            //     if (this.gamePlane.freePositions.some(GPposition => GPposition.x === position.x && GPposition.y === position.y)) {
+            //         console.log('snake body interferes with gameplane positions');
+            //     }
+            // });
         }
 
         // Loop through bugs ===================================================================
@@ -177,25 +161,32 @@ class App {
 
             // Get bug next head position
             let nextPosition = bug.getNextHeadPosition();
-
-            // Check bug can move in its direction
-            if (this.gamePlane.isPositionOutside(nextPosition)
-                || !this.gamePlane.isPositionFree(nextPosition)
-                || this.isCreaturePosition(nextPosition)) {
-                bug.moveIndex++;
-                continue;
-            }
             
             // Check if fruit is eaten
             if (this.fruit.isEaten(nextPosition)) {
-                this.fruit.setNewPosition(this.gamePlane.getFreePosition());
+                this.fruit.setNewPosition(this.getFreePosition());
                 bug.increaseLength();
                 bug.numberOfEaten.apples++;
-                console.log(`Bug ${bug.name} just eat fruit!`, bug);
-            }
+                console.log(`Bug ${bug.name} just eat fruit!`);
 
-            // Move Bug
-            bug.move(nextPosition);
+                // Remove last fruit position / new snake head position from gamePlane
+                this.gamePlane.tryToRemove(nextPosition);
+                // Move Bug
+                bug.move(nextPosition)
+            }
+            // Check if gamePlane has nextPosition
+            else if (this.gamePlane.tryToRemove(nextPosition)) {
+                // Move Bug and add free position that bug left behind
+                this.gamePlane.tryToAddPosition(bug.move(nextPosition));
+            }
+            else {
+                bug.moveIndex++;
+            }
+            // bug.body.forEach(position => {
+            //     if (this.gamePlane.freePositions.some(GPposition => GPposition.x === position.x && GPposition.y === position.y)) {
+            //         console.log('bug body interferes with gameplane positions');
+            //     }
+            // });
         }
 
         if (!this.isGameOver) {
@@ -256,20 +247,46 @@ class App {
             });
     }
 
-    getInitialSnakeHead(snakeIndex) {
-        const headPosition = this.gamePlane.freePositions[Math.floor(this.gamePlane.freePositions.length / 2)];
-        const result = {
-            x: headPosition.x + snakeIndex,
-            y: headPosition.y + snakeIndex
-        };
+    handleGameSpeedChange(input) {
+        // Check the gameSpeed change
+        if (input % 10 == 0) {
+            // Change setInterval time => increase gameSpeed
+            this.gameSpeed -= 10;
+            if (this.gameSpeed < 30) { this.gameSpeed = 30; }
+            
+            // Reset game interval
+            clearInterval(this.gameInterval);
+            this.gameInterval = setInterval(this.gameCycle.bind(this), this.gameSpeed);
+        }
+    }
+    handleBugCreation(input) {
+        if (input % 5 == 0) {
+            let bug;
+            if (this.bugs.length % 3 == 0) {
+                bug = new Bug(this.getFreePositionAndRemove(), this.gamePlane.tileSize);
+            }
+            else {
+                bug = new CleverBug(this.getFreePositionAndRemove(), this.gamePlane.tileSize
+                    , this.isMoveablePosition.bind(this), this.isCreaturePosition.bind(this)
+                    , this.fruit.getBodyPositions.bind(this.fruit));
+            }
 
-        this.gamePlane.removeFreePosition(result);
+            this.bugs.push(bug);
+            console.log(`New Bug ${bug.name} is in the game!`);
+        }
+    }
+
+    getInitialSnakeHead(snakeIndex) {
+        const coordinate = Math.floor(this.gamePlane.gridSize / 2) + snakeIndex;
+        const result = { x: coordinate, y: coordinate };
+
+        this.gamePlane.tryToRemove(result);
 
         return result;
     }
 
-    isPositionFree(position) {
-        return this.gamePlane.isPositionFree(position);
+    isMoveablePosition(position) {
+        return this.gamePlane.isMoveablePosition(position);
     }
 
     isCreaturePosition(position) {
@@ -280,11 +297,17 @@ class App {
             );
     }
 
-    getEatableCreaturesBodyPositions() {
-        return this.bugs.map(mc => mc.body).flat();
+    getRandomPositionIndex() {
+        return Math.floor(Math.random() * this.gamePlane.freePositions.length);
     }
-
-    getFruitPosition() {
-        return this.fruit.position;
+    getFreePosition() {
+        const randomPositionIndex = this.getRandomPositionIndex();
+        return this.gamePlane.freePositions[randomPositionIndex];
+    }
+    getFreePositionAndRemove() {
+        const randomPositionIndex = this.getRandomPositionIndex();
+        const randomPosition = this.gamePlane.freePositions[randomPositionIndex];
+        this.gamePlane.removeFreePositionByIndex(randomPositionIndex);
+        return randomPosition;
     }
 }
