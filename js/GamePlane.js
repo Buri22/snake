@@ -1,4 +1,4 @@
-class GamePlane {
+export default class GamePlane {
     // Properties
     canvas = null;
     canvasWidth = null;

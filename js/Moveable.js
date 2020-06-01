@@ -1,4 +1,5 @@
-class Moveable extends Drawable {
+import {Drawable} from './Drawable.js';
+export class Moveable extends Drawable {
     moveIndex = 0;
     direction = null;
     length = 0;

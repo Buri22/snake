@@ -1,5 +1,5 @@
 'use strict';
-//import GamePlane from "GamePlane";
+import App from "./App.js";
 
 document.addEventListener("DOMContentLoaded", function() {
     var app = new App();

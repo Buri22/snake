@@ -1,4 +1,6 @@
-class Creature extends Moveable {
+import {Moveable} from './Moveable.js';
+
+export class Creature extends Moveable {
     name = '';
     color = '';
     width = 0;

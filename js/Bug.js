@@ -1,4 +1,5 @@
-class Bug extends Creature {
+import {Creature} from './Creature.js';
+export default class Bug extends Creature {
     changeDirectionRate = 5;
     drawStyle = DRAW_STYLE.square;
 

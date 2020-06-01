@@ -1,4 +1,5 @@
-class Snake extends Creature {
+import {Creature} from './Creature.js';
+export default class Snake extends Creature {
     shitColor = '#663300';
     shitTrail = [];
     directionsStack = [];

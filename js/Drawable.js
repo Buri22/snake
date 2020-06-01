@@ -1,4 +1,4 @@
-class Drawable {
+export class Drawable {
     body = [];
 
     constructor(initialBody) {

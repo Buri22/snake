@@ -1,4 +1,5 @@
-class CleverBug extends Bug {
+import Bug from './Bug.js';
+export default class CleverBug extends Bug {
     isMoveablePosition = null;
     isCreaturePosition = null;
     getFruitPosition = null;
@@ -6,7 +7,7 @@ class CleverBug extends Bug {
     constructor(initialPosition, initialWidth, isMoveablePosition, isCreaturePosition, getFruitPosition) {
         super(initialPosition, initialWidth);
 
-        this.moveTurnRate = 2;
+        this.moveTurnRate = 1;
         this.changeDirectionRate = 0;
         this.drawStyle = DRAW_STYLE.circle;
 

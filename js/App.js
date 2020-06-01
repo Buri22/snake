@@ -1,6 +1,12 @@
 //import EventBus from './EventBus';
+import GamePlane from './GamePlane.js';
+import Fruit from './Fruit.js';
+import Snake from './Snake.js';
+import Bug from './Bug.js';
+import CleverBug from './CleverBug.js';
 
-class App {
+
+export default class App {
     // App properties
     gamePlane = null;
     fruit = null;
@@ -21,13 +27,13 @@ class App {
         this.fruit = new Fruit(this.gamePlane.gridSize, this.gamePlane.gridSize
             , this.gamePlane.tileSize, this.gamePlane.tileSize, this.getFreePosition());
 
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < 2; i++) {
             this.snakes.push(
                 new Snake(this.getInitialSnakeHead(i), this.gamePlane.tileSize, 10, i + 1, CONTROL_KEY_SETS[i])
             );
         }
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 0; i++) {
             this.bugs.push(
                 new CleverBug(this.getFreePositionAndRemove(), this.gamePlane.tileSize
                     , this.isMoveablePosition.bind(this), this.isCreaturePosition.bind(this)
@@ -252,6 +258,7 @@ class App {
         if (input % 10 == 0) {
             // Change setInterval time => increase gameSpeed
             this.gameSpeed -= 10;
+            console.log(`GameSpeed: ${this.gameSpeed}`);
             if (this.gameSpeed < 30) { this.gameSpeed = 30; }
             
             // Reset game interval

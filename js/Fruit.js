@@ -1,4 +1,5 @@
-class Fruit extends Drawable {
+import {Drawable} from './Drawable.js';
+export default class Fruit extends Drawable {
     color = '#ff0707';
     position = {x: null, y: null};
     height = null;
